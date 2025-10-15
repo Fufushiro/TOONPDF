@@ -40,6 +40,49 @@ Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblio
 ### Visor de PDF
 - Modo normal con controles y barra de progreso
 - Modo pantalla completa inmersivo
+```markdown
+# PDFTOON v0.1.3
+
+Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblioteca digital", historial persistente y modo de lectura inmersivo.
+
+## 🚀 Características Principales
+
+### ✨ Nueva Interfaz Biblioteca Digital
+- **Pantalla principal moderna y limpia** con diseño minimalista
+- **Saludo personalizado** basado en la hora del día
+- **Barra de búsqueda** para encontrar documentos rápidamente
+- **Sección "Continuar leyendo"** que destaca el último PDF abierto
+- **Lista de documentos recientes** con información detallada de progreso
+
+### 📚 Historial Persistente
+- **Base de datos local** que guarda automáticamente todos los PDFs abiertos
+- **Seguimiento de progreso** con última página leída y porcentaje completado
+- **Fecha de última lectura** para cada documento
+- **Continuación automática** desde donde se quedó la lectura
+
+### 📖 Visor de PDF Avanzado
+- **Modo de pantalla completa inmersivo** que oculta completamente las barras del sistema
+- **Barra de progreso visual** dentro y fuera del visor
+- **Controles intuitivos** para navegación entre páginas
+- **Información en tiempo real** de página actual y progreso total
+- **Tap para mostrar/ocultar controles** en modo normal
+
+### 🔧 Funcionalidades Técnicas
+- **Storage Access Framework (SAF)** para selección segura de archivos
+- **Arquitectura MVVM** con Room Database para persistencia
+- **Renderizado optimizado** con manejo en segundo plano
+- **Verificación de archivos** con manejo de errores si el PDF fue movido o eliminado
+
+## 📱 Capturas de Pantalla
+
+### Pantalla Principal
+- Interfaz limpia con saludo personalizado
+- Sección "Continuar leyendo" destacada
+- Lista de documentos recientes con progreso visual
+
+### Visor de PDF
+- Modo normal con controles y barra de progreso
+- Modo pantalla completa inmersivo
 - Información detallada de páginas y porcentaje
 
 ## 🛠️ Instalación y Uso
@@ -55,7 +98,7 @@ Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblio
 2. Selecciona un archivo PDF desde tu almacenamiento
 3. El PDF se abrirá automáticamente y se guardará en tu biblioteca
 
-#### 📖 Continuar Leyendo
+#### � Continuar Leyendo
 1. En la pantalla principal, encuentra la tarjeta **"Continuar leyendo"**
 2. Toca **"Continuar"** para reanudar desde la última página leída
 3. El progreso se actualiza automáticamente mientras lees
@@ -81,7 +124,7 @@ Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblio
 2. El PDF se eliminará del historial (no del almacenamiento)
 3. Puedes volver a agregarlo seleccionándolo nuevamente
 
-## 🔄 Cambios en la Versión 0.1.3
+## � Cambios en la Versión 0.1.3
 
 ### 🎨 Interfaz Completamente Rediseñada
 - **Nueva pantalla principal** con estilo biblioteca digital minimalista
@@ -89,7 +132,7 @@ Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblio
 - **Tarjetas con sombras suaves** y bordes redondeados
 - **Sección "Continuar leyendo"** con fondo coral destacado
 
-### 🗄️ Historial Persistente
+### � Historial Persistente
 - **Base de datos Room** para almacenamiento local confiable
 - **Seguimiento automático** de progreso de lectura
 - **Información detallada** por cada PDF: nombre, páginas, progreso, fecha
@@ -126,7 +169,7 @@ MainActivity ↔ MainViewModel ↔ PdfRepository ↔ PdfHistoryDao ↔ Room Data
 PdfViewerActivity ↔ MainViewModel
 ```
 
-### 🗃️ Base de Datos
+### � Base de Datos
 - **Room Database** con entidad `PdfHistoryEntity`
 - **Campos**: URI, nombre, páginas totales, última página, fecha, tamaño
 - **Operaciones**: CRUD completo con LiveData para actualizaciones reactivas
@@ -150,13 +193,13 @@ PdfViewerActivity ↔ MainViewModel
 - **Ordenamiento por fecha** y recuperación de datos
 - **Casos de reemplazo** y manejo de duplicados
 
-## 🔒 Permisos
+## � Permisos
 
 La aplicación utiliza permisos modernos y seguros:
 - `READ_MEDIA_DOCUMENTS` (Android 13+)
 - `READ_EXTERNAL_STORAGE` (hasta Android 12)
 
-## 🏗️ Compilación
+## 🛠️ Compilación
 
 ### Requisitos de Desarrollo
 - Android Studio Hedgehog o superior
@@ -170,6 +213,49 @@ La aplicación utiliza permisos modernos y seguros:
 - **Room Database** para persistencia local
 - **Lifecycle & ViewModel** para arquitectura MVVM
 - **android-pdf-viewer** para renderizado de PDF
+
+### Build y firma de APK
+
+Puedes generar el APK de release directamente desde consola:
+
+```bash
+./gradlew clean assembleRelease
+```
+
+Salida esperada: el archivo `app/build/outputs/apk/release/app-release.apk`.
+
+- Si existe `keystore/keystore.properties` con credenciales válidas, el APK se firma con tu keystore.
+- Si NO existe, el build usa la firma de debug como fallback para que igualmente obtengas un APK firmado para pruebas.
+
+Para configurar tu propia firma:
+
+1. Crea/copia tu keystore (JKS) en `keystore/` (por ejemplo `keystore/KEYSTORE.jks`).
+2. Crea el archivo `keystore/keystore.properties` a partir del ejemplo:
+
+```properties
+# keystore/keystore.properties
+storeFile=keystore/KEYSTORE.jks
+storePassword=TU_PASSWORD
+keyAlias=TU_ALIAS
+keyPassword=TU_PASSWORD_ALIAS
+```
+
+3. Vuelve a compilar:
+
+```bash
+./gradlew clean assembleRelease
+```
+
+### Tests y Lint
+
+Ejecutar tests unitarios y lint crítico de release:
+
+```bash
+./gradlew testReleaseUnitTest
+./gradlew lintVitalRelease
+```
+
+Nota: Se migró Room a KSP para builds más rápidos y se centralizaron dependencias en el catálogo de versiones (gradle/libs.versions.toml).
 
 ## 📄 Licencia
 
@@ -195,3 +281,5 @@ Para reportar bugs o solicitar features, crear un issue en GitHub con:
 ---
 
 **PDFTOON v0.1.3** - Una experiencia de lectura de PDF moderna y completa para Android.
+
+```
