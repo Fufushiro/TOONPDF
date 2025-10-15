@@ -40,8 +40,7 @@ Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblio
 ### Visor de PDF
 - Modo normal con controles y barra de progreso
 - Modo pantalla completa inmersivo
-```markdown
-# PDFTOON v0.1.3
+# PDFTOON v0.3.0
 
 Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblioteca digital", historial persistente y modo de lectura inmersivo.
 
@@ -124,42 +123,35 @@ Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblio
 2. El PDF se eliminará del historial (no del almacenamiento)
 3. Puedes volver a agregarlo seleccionándolo nuevamente
 
-## � Cambios en la Versión 0.1.3
+## 🔁 Cambios en la Versión 0.3.0
 
-### 🎨 Interfaz Completamente Rediseñada
-- **Nueva pantalla principal** con estilo biblioteca digital minimalista
-- **Colores y tipografía modernos** con jerarquía visual clara
-- **Tarjetas con sombras suaves** y bordes redondeados
-- **Sección "Continuar leyendo"** con fondo coral destacado
+### � Añadido
+- Acceso moderno y persistente al almacenamiento con **Storage Access Framework (SAF)**:
+	- Apertura de documentos con permisos de URI persistentes (Android 11–15).
+	- Opción de acceso a carpeta mediante "Abrir carpeta" en Ajustes para permisos de largo plazo.
+- Pantalla de **Ajustes** con:
+	- Nombre de usuario para personalizar el saludo.
+	- Selector de tema: Sistema, Claro, Oscuro y **AMOLED** (negro puro) con preferencia persistente.
+	- Selector de avatar: cambia la foto de inicio en cualquier momento; se mantiene entre reinicios.
+- Tema oscuro **AMOLED** con fondos negros puros y texto de alto contraste.
 
-### � Historial Persistente
-- **Base de datos Room** para almacenamiento local confiable
-- **Seguimiento automático** de progreso de lectura
-- **Información detallada** por cada PDF: nombre, páginas, progreso, fecha
+### � Cambiado
+- Reemplazo de prompts de permisos heredados por los diálogos oficiales del sistema Android.
+- Mejora del contraste de la UI principal y uso consistente de colores del tema.
+- El saludo ahora usa el nombre configurado por el usuario (ej. "Buenos días, Ana").
 
-### 📈 Sistema de Progreso Avanzado
-- **Cálculo automático** de porcentaje leído
-- **Barra de progreso visual** en lista principal y visor
-- **Persistencia de última página** leída por documento
-- **Actualización en tiempo real** durante la lectura
+### � Corregido
+- Problemas de permisos de almacenamiento que no persistían o no eran visibles en ajustes del sistema.
+- Imposibilidad de modificar la foto de inicio tras agregarla una vez.
+- Varias incidencias menores de estabilidad y accesibilidad al abrir o reubicar PDFs.
 
-### 🖥️ Modo Inmersivo Completo
-- **Ocultación total** de barras de estado y navegación del sistema
-- **Controles por tap** para mostrar/ocultar elementos temporalmente
-- **Experiencia de lectura sin distracciones**
-- **Mantenimiento de pantalla activa** durante la lectura
+### ✅ Compatibilidad
+- Comportamiento verificado en Android 11 (API 30) hasta Android 15 (API 35) usando SAF.
+- Evita permisos restringidos por Play Store; no requiere READ_EXTERNAL_STORAGE legado.
 
-### 🔧 Mejoras Técnicas
-- **Arquitectura MVVM** con separación clara de responsabilidades
-- **Storage Access Framework** para manejo moderno de archivos
-- **Manejo de errores robusto** para archivos inexistentes
-- **Tests unitarios** para validación de cálculos y operaciones
-
-### 🚀 Rendimiento Optimizado
-- **Renderizado en segundo plano** para evitar bloqueos de UI
-- **Carga lazy** de elementos de lista
-- **Gestión eficiente de memoria** durante la lectura
-- **Animaciones suaves** en transiciones de interfaz
+### 🧑‍� Notas para desarrolladores
+- Claves de DataStore añadidas: `app_theme`, `user_name`, `user_avatar_uri`, `storage_tree_uri`.
+- El tema se aplica tempranamente en las Activities mediante `ThemeUtils.applyTheme(...)`.
 
 ## ⚙️ Arquitectura Técnica
 
@@ -280,6 +272,4 @@ Para reportar bugs o solicitar features, crear un issue en GitHub con:
 
 ---
 
-**PDFTOON v0.1.3** - Una experiencia de lectura de PDF moderna y completa para Android.
-
-```
+**PDFTOON v0.3.0** - Una experiencia de lectura de PDF moderna y completa para Android.
