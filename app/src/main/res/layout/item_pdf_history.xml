@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- PDF Thumbnail placeholder -->
+        <ImageView
+            android:id="@+id/imageThumbnail"
+            android:layout_width="48dp"
+            android:layout_height="64dp"
+            android:background="@drawable/pdf_thumbnail_placeholder"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- File Name -->
+        <TextView
+            android:id="@+id/textFileName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/buttonDelete"
+            app:layout_constraintStart_toEndOf="@+id/imageThumbnail"
+            app:layout_constraintTop_toTopOf="@+id/imageThumbnail"
+            tools:text="Document.pdf" />
+
+        <!-- Page Info -->
+        <TextView
+            android:id="@+id/textPageInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@+id/textFileName"
+            app:layout_constraintStart_toStartOf="@+id/textFileName"
+            app:layout_constraintTop_toBottomOf="@+id/textFileName"
+            tools:text="Página 25 / 120" />
+
+        <!-- Progress Bar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="4dp"
+            android:layout_marginTop="8dp"
+            android:progressTint="?attr/colorPrimary"
+            app:layout_constraintEnd_toStartOf="@+id/textProgress"
+            app:layout_constraintStart_toStartOf="@+id/textPageInfo"
+            app:layout_constraintTop_toBottomOf="@+id/textPageInfo"
+            tools:progress="45" />
+
+        <!-- Progress Percentage -->
+        <TextView
+            android:id="@+id/textProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/progressBar"
+            app:layout_constraintEnd_toEndOf="@+id/textFileName"
+            app:layout_constraintTop_toTopOf="@+id/progressBar"
+            tools:text="45%" />
+
+        <!-- Last Read Date -->
+        <TextView
+            android:id="@+id/textLastRead"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="@+id/imageThumbnail"
+            app:layout_constraintEnd_toEndOf="@+id/textProgress"
+            app:layout_constraintStart_toStartOf="@+id/progressBar"
+            app:layout_constraintTop_toBottomOf="@+id/progressBar"
+            tools:text="Última lectura: hace 3 días" />
+
+        <!-- Delete Button -->
+        <ImageButton
+            android:id="@+id/buttonDelete"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Eliminar PDF"
+            android:src="@drawable/ic_delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/colorOnSurfaceVariant" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

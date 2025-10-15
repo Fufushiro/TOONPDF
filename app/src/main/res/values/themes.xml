@@ -24,6 +24,26 @@
         <!-- Light status bar and navigation bar icons. -->
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
-        <!-- Customize your theme here. -->
+        <!-- Background colors -->
+        <item name="android:windowBackground">@color/background_color</item>
+        <item name="colorSurface">@color/surface_color</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+    </style>
+
+    <!-- Theme for MainActivity - Clean library interface -->
+    <style name="Theme.PDFTOON.NoActionBar" parent="Theme.PDFTOON">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <!-- Theme for PdfViewerActivity - Fullscreen capable -->
+    <style name="Theme.PDFTOON.Fullscreen" parent="Theme.PDFTOON">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@android:color/black</item>
     </style>
 </resources>

@@ -32,6 +32,25 @@
     <color name="md_theme_dark_tertiaryContainer">#4B4163</color>
     <color name="md_theme_dark_onTertiaryContainer">#E9DDFF</color>
 
+    <!-- Custom App Colors -->
+    <color name="background_color">#FFFFFF</color>
+    <color name="surface_color">#FAFAFA</color>
+
+    <!-- Continue Reading Section Colors -->
+    <color name="continue_reading_background">#FFE4E1</color>
+    <color name="continue_reading_text">#8B0000</color>
+    <color name="continue_reading_text_secondary">#CD5C5C</color>
+    <color name="continue_reading_button">#DC143C</color>
+
+    <!-- Surface Variants -->
+    <color name="md_theme_light_surfaceVariant">#DEE3EA</color>
+    <color name="md_theme_light_outline">#6F777E</color>
+
+    <!-- Utility Colors -->
+    <color name="white_50">#80FFFFFF</color>
+    <color name="black_12">#1F000000</color>
+    <color name="black_60">#99000000</color>
+
     <!-- Common Colors -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>

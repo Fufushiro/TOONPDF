@@ -1,28 +1,32 @@
 package ia.ankherth.grease
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.Settings
-import android.view.Menu
-import android.view.MenuItem
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import ia.ankherth.grease.adapter.PdfHistoryAdapter
+import ia.ankherth.grease.data.PdfHistoryItem
 import ia.ankherth.grease.databinding.ActivityMainBinding
+import ia.ankherth.grease.viewmodel.MainViewModel
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val STORAGE_PERMISSION_CODE = 100
+    private val viewModel: MainViewModel by viewModels()
+    private lateinit var pdfAdapter: PdfHistoryAdapter
+    private var allPdfs: List<PdfHistoryItem> = emptyList()
 
     private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let { loadPdfFromUri(it) }
+        uri?.let {
+            handleNewPdfSelection(it)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,70 +34,95 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Check if we're handling an intent with PDF data
-        when {
-            intent?.action == Intent.ACTION_VIEW -> {
-                intent.data?.let { loadPdfFromUri(it) }
-            }
-            else -> {
-                checkStoragePermissionAndOpenPicker()
+        setupUI()
+        setupRecyclerView()
+        setupClickListeners()
+        observeData()
+
+        // Handle intent if app was opened with a PDF
+        intent?.data?.let { uri ->
+            if (intent.action == Intent.ACTION_VIEW) {
+                handleNewPdfSelection(uri)
             }
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.top_app_bar, menu)
-        return true
+    private fun setupUI() {
+        // Set greeting based on time of day
+        val greeting = getGreetingMessage()
+        binding.textGreeting.text = greeting
+
+        // Setup search functionality
+        binding.editTextSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                filterPdfs(s.toString())
+            }
+        })
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_open -> {
-                checkStoragePermissionAndOpenPicker()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+    private fun setupRecyclerView() {
+        pdfAdapter = PdfHistoryAdapter(
+            onPdfClick = { pdf -> openPdf(pdf) },
+            onDeleteClick = { pdf -> deletePdf(pdf) }
+        )
+
+        binding.recyclerViewPdfs.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = pdfAdapter
         }
     }
 
-    private fun checkStoragePermissionAndOpenPicker() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                startActivity(intent)
-                return
-            }
+    private fun setupClickListeners() {
+        binding.fabAddPdf.setOnClickListener {
             openPdfPicker()
-        } else {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                    STORAGE_PERMISSION_CODE
-                )
-            } else {
-                openPdfPicker()
+        }
+
+        binding.buttonContinueReading.setOnClickListener {
+            viewModel.getMostRecentPdf { recentPdf: PdfHistoryItem? ->
+                recentPdf?.let { pdf -> openPdf(pdf) }
             }
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == STORAGE_PERMISSION_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openPdfPicker()
-            } else {
-                Toast.makeText(this, "Storage permission is required", Toast.LENGTH_LONG).show()
-                finish()
+    private fun observeData() {
+        viewModel.allPdfs.observe(this) { pdfs: List<PdfHistoryItem> ->
+            allPdfs = pdfs
+            updateUI(pdfs)
+        }
+    }
+
+    private fun updateUI(pdfs: List<PdfHistoryItem>) {
+        if (pdfs.isEmpty()) {
+            binding.layoutEmptyState.visibility = View.VISIBLE
+            binding.recyclerViewPdfs.visibility = View.GONE
+            binding.cardContinueReading.visibility = View.GONE
+        } else {
+            binding.layoutEmptyState.visibility = View.GONE
+            binding.recyclerViewPdfs.visibility = View.VISIBLE
+
+            // Show most recent PDF in "Continue Reading" section
+            val mostRecent = pdfs.firstOrNull()
+            mostRecent?.let { pdf ->
+                binding.cardContinueReading.visibility = View.VISIBLE
+                binding.textContinueReadingTitle.text = pdf.fileName
+                binding.textContinueReadingProgress.text =
+                    "Página ${pdf.lastPageRead + 1} / ${pdf.totalPages} • ${pdf.progressPercentage.toInt()}%"
             }
+
+            pdfAdapter.submitList(pdfs)
+        }
+    }
+
+    private fun filterPdfs(query: String) {
+        if (query.isBlank()) {
+            pdfAdapter.submitList(allPdfs)
+        } else {
+            val filteredList = allPdfs.filter { pdf ->
+                pdf.fileName.contains(query, ignoreCase = true)
+            }
+            pdfAdapter.submitList(filteredList)
         }
     }
 
@@ -101,15 +130,84 @@ class MainActivity : AppCompatActivity() {
         getContent.launch("application/pdf")
     }
 
-    private fun loadPdfFromUri(uri: Uri) {
-        binding.pdfView.fromUri(uri)
-            .enableSwipe(true)
-            .swipeHorizontal(false)
-            .enableDoubletap(true)
-            .defaultPage(0)
-            .onError { t ->
-                Toast.makeText(this, "Error loading PDF: ${t.message}", Toast.LENGTH_LONG).show()
+    private fun handleNewPdfSelection(uri: Uri) {
+        try {
+            // Get file name from URI
+            val fileName = getFileNameFromUri(uri) ?: "Documento PDF"
+
+            val intent = Intent(this, PdfViewerActivity::class.java).apply {
+                putExtra(PdfViewerActivity.EXTRA_PDF_URI, uri)
+                putExtra(PdfViewerActivity.EXTRA_FILE_NAME, fileName)
+                putExtra(PdfViewerActivity.EXTRA_CURRENT_PAGE, 0)
             }
-            .load()
+            startActivity(intent)
+
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error al abrir el PDF: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun openPdf(pdf: PdfHistoryItem) {
+        try {
+            val uri = Uri.parse(pdf.uri)
+
+            // Check if file still exists
+            if (checkIfFileExists(uri)) {
+                val intent = Intent(this, PdfViewerActivity::class.java).apply {
+                    putExtra(PdfViewerActivity.EXTRA_PDF_URI, uri)
+                    putExtra(PdfViewerActivity.EXTRA_FILE_NAME, pdf.fileName)
+                    putExtra(PdfViewerActivity.EXTRA_CURRENT_PAGE, pdf.lastPageRead)
+                }
+                startActivity(intent)
+            } else {
+                // File no longer exists, show message and remove from database
+                Toast.makeText(this, "El archivo ya no existe en esta ubicación", Toast.LENGTH_LONG).show()
+                viewModel.deletePdf(pdf)
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error al abrir el PDF: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun deletePdf(pdf: PdfHistoryItem) {
+        viewModel.deletePdf(pdf)
+        Toast.makeText(this, "PDF eliminado del historial", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun getFileNameFromUri(uri: Uri): String? {
+        return when (uri.scheme) {
+            "content" -> {
+                val cursor = contentResolver.query(uri, null, null, null, null)
+                cursor?.use {
+                    if (it.moveToFirst()) {
+                        val displayNameIndex = it.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                        if (displayNameIndex >= 0) {
+                            it.getString(displayNameIndex)
+                        } else null
+                    } else null
+                }
+            }
+            "file" -> {
+                uri.lastPathSegment
+            }
+            else -> null
+        }
+    }
+
+    private fun checkIfFileExists(uri: Uri): Boolean {
+        return try {
+            contentResolver.openInputStream(uri)?.use { true } ?: false
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun getGreetingMessage(): String {
+        val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        return when (currentHour) {
+            in 0..11 -> "Buenos días, Usuario"
+            in 12..17 -> "Buenas tardes, Usuario"
+            else -> "Buenas noches, Usuario"
+        }
     }
 }
