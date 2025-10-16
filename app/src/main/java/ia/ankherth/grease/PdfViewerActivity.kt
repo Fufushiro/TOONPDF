@@ -16,7 +16,14 @@ import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
 import com.github.barteksc.pdfviewer.listener.OnTapListener
 import ia.ankherth.grease.databinding.ActivityPdfViewerBinding
 import ia.ankherth.grease.viewmodel.MainViewModel
+import androidx.lifecycle.lifecycleScope
+import ia.ankherth.grease.util.ThemeUtils
+import kotlinx.coroutines.launch
 
+/**
+ * Actividad para visualizar PDFs con persistencia mejorada
+ * Guarda automáticamente el progreso de lectura y utiliza Room para almacenamiento persistente
+ */
 class PdfViewerActivity : AppCompatActivity(), OnLoadCompleteListener, OnPageChangeListener, OnTapListener {
 
     private lateinit var binding: ActivityPdfViewerBinding
@@ -28,6 +35,7 @@ class PdfViewerActivity : AppCompatActivity(), OnLoadCompleteListener, OnPageCha
     private var currentPage: Int = 0
     private var isFullscreen = false
     private var isControlsVisible = true
+    private var filePath: String? = null
 
     companion object {
         const val EXTRA_PDF_URI = "pdf_uri"
@@ -36,11 +44,12 @@ class PdfViewerActivity : AppCompatActivity(), OnLoadCompleteListener, OnPageCha
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeUtils.applyTheme(this, fullscreen = true)
         super.onCreate(savedInstanceState)
         binding = ActivityPdfViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Get data from intent
+        // Obtener datos del intent
         pdfUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra(EXTRA_PDF_URI, Uri::class.java)
         } else {
@@ -50,16 +59,25 @@ class PdfViewerActivity : AppCompatActivity(), OnLoadCompleteListener, OnPageCha
         fileName = intent.getStringExtra(EXTRA_FILE_NAME) ?: "Documento PDF"
         currentPage = intent.getIntExtra(EXTRA_CURRENT_PAGE, 0)
 
+        // Intentar extraer la ruta del archivo para mayor robustez
+        extractFilePath()
+
         setupUI()
         setupPdfViewer()
         setupClickListeners()
         setupBackPressHandler()
     }
 
+    override fun onPause() {
+        super.onPause()
+        // Guardar progreso al pausar/salir de la actividad
+        saveProgress()
+    }
+
     private fun setupUI() {
         binding.toolbar.title = fileName
 
-        // Enable immersive mode preparation
+        // Preparar modo inmersivo
         WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 
@@ -107,6 +125,7 @@ class PdfViewerActivity : AppCompatActivity(), OnLoadCompleteListener, OnPageCha
                 if (isFullscreen) {
                     toggleFullscreen()
                 } else {
+                    saveProgress()
                     finish()
                 }
             }
@@ -118,14 +137,17 @@ class PdfViewerActivity : AppCompatActivity(), OnLoadCompleteListener, OnPageCha
         binding.textTotalPages.text = totalPages.toString()
         updateProgress()
 
-        // Save or update PDF in database
+        // Guardar o actualizar PDF en la base de datos
         pdfUri?.let { uri: Uri ->
-            viewModel.addOrUpdatePdf(
-                uri = uri.toString(),
-                fileName = fileName,
-                totalPages = totalPages,
-                currentPage = currentPage
-            )
+            lifecycleScope.launch {
+                viewModel.addOrUpdatePdf(
+                    uri = uri.toString(),
+                    fileName = fileName,
+                    totalPages = totalPages,
+                    currentPage = currentPage,
+                    filePath = filePath
+                )
+            }
         }
     }
 
@@ -133,10 +155,8 @@ class PdfViewerActivity : AppCompatActivity(), OnLoadCompleteListener, OnPageCha
         currentPage = page
         updateProgress()
 
-        // Update progress in database
-        pdfUri?.let { uri: Uri ->
-            viewModel.updateProgress(uri.toString(), currentPage)
-        }
+        // No actualizamos la base de datos en cada cambio de página para evitar operaciones excesivas
+        // El progreso se guardará al pausar/salir de la actividad
     }
 
     override fun onTap(e: android.view.MotionEvent?): Boolean {
@@ -155,13 +175,13 @@ class PdfViewerActivity : AppCompatActivity(), OnLoadCompleteListener, OnPageCha
         binding.progressBarReading.progress = progress
         binding.textProgressPercentage.text = "${progress}%"
 
-        // Update navigation buttons
+        // Actualizar botones de navegación
         binding.buttonPreviousPage.isEnabled = currentPage > 0
         binding.buttonNextPage.isEnabled = currentPage < totalPages - 1
     }
 
     private fun toggleControlsVisibility() {
-        if (isFullscreen) return // Don't show controls in fullscreen unless specifically requested
+        if (isFullscreen) return // No mostrar controles en pantalla completa a menos que se solicite específicamente
 
         isControlsVisible = !isControlsVisible
         val visibility = if (isControlsVisible) View.VISIBLE else View.GONE
@@ -176,7 +196,7 @@ class PdfViewerActivity : AppCompatActivity(), OnLoadCompleteListener, OnPageCha
         val windowInsetsController = WindowInsetsControllerCompat(window, window.decorView)
 
         if (isFullscreen) {
-            // Enter fullscreen mode
+            // Entrar en modo pantalla completa
             windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
             windowInsetsController.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
@@ -185,26 +205,63 @@ class PdfViewerActivity : AppCompatActivity(), OnLoadCompleteListener, OnPageCha
             binding.bottomControls.visibility = View.GONE
             isControlsVisible = false
 
-            // Keep screen on during reading
+            // Mantener la pantalla encendida durante la lectura
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         } else {
-            // Exit fullscreen mode
+            // Salir de modo pantalla completa
             windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
 
             binding.toolbar.visibility = View.VISIBLE
             binding.bottomControls.visibility = View.VISIBLE
             isControlsVisible = true
 
-            // Allow screen to turn off normally
+            // Permitir que la pantalla se apague normalmente
             window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        // Make sure to save final progress
-        pdfUri?.let { uri: Uri ->
-            viewModel.updateProgress(uri.toString(), currentPage)
+    private fun saveProgress() {
+        pdfUri?.let { uri ->
+            lifecycleScope.launch {
+                viewModel.updateProgress(uri.toString(), currentPage)
+                // También actualizamos la preferencia del último PDF abierto
+                viewModel.addOrUpdatePdf(
+                    uri = uri.toString(),
+                    fileName = fileName,
+                    totalPages = totalPages,
+                    currentPage = currentPage,
+                    filePath = filePath
+                )
+            }
+        }
+    }
+
+    /**
+     * Intenta extraer la ruta de archivo real para facilitar la reubicación si es necesario
+     */
+    private fun extractFilePath() {
+        try {
+            pdfUri?.let { uri ->
+                if (uri.scheme == "file") {
+                    filePath = uri.path
+                } else if (uri.scheme == "content") {
+                    contentResolver.openInputStream(uri)?.use { _ ->
+                        val cursor = contentResolver.query(uri, null, null, null, null)
+                        cursor?.use {
+                            if (it.moveToFirst()) {
+                                val displayNameIndex = it.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                                if (displayNameIndex >= 0) {
+                                    val displayName = it.getString(displayNameIndex)
+                                    val docId = uri.toString()
+                                    filePath = docId
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            filePath = null
         }
     }
 }

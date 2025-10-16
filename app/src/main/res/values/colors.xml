@@ -1,50 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Light Theme Colors -->
-    <color name="md_theme_light_primary">#006689</color>
+    <!-- Material You Green Palette (Light) -->
+    <color name="md_theme_light_primary">#2E7D32</color>
     <color name="md_theme_light_onPrimary">#FFFFFF</color>
-    <color name="md_theme_light_primaryContainer">#C3E8FF</color>
-    <color name="md_theme_light_onPrimaryContainer">#001E2C</color>
-    <color name="md_theme_light_secondary">#4F616E</color>
+    <color name="md_theme_light_primaryContainer">#A5D6A7</color>
+    <color name="md_theme_light_onPrimaryContainer">#103916</color>
+
+    <color name="md_theme_light_secondary">#558B2F</color>
     <color name="md_theme_light_onSecondary">#FFFFFF</color>
-    <color name="md_theme_light_secondaryContainer">#D2E5F5</color>
-    <color name="md_theme_light_onSecondaryContainer">#0B1D28</color>
-    <color name="md_theme_light_tertiary">#63597C</color>
+    <color name="md_theme_light_secondaryContainer">#C5E1A5</color>
+    <color name="md_theme_light_onSecondaryContainer">#1A2E05</color>
+
+    <color name="md_theme_light_tertiary">#009688</color>
     <color name="md_theme_light_onTertiary">#FFFFFF</color>
-    <color name="md_theme_light_tertiaryContainer">#E9DDFF</color>
-    <color name="md_theme_light_onTertiaryContainer">#1E1635</color>
-    <color name="md_theme_light_background">#FDFCFF</color>
-    <color name="md_theme_light_onBackground">#1A1C1E</color>
-    <color name="md_theme_light_surface">#FDFCFF</color>
-    <color name="md_theme_light_onSurface">#1A1C1E</color>
+    <color name="md_theme_light_tertiaryContainer">#B2DFDB</color>
+    <color name="md_theme_light_onTertiaryContainer">#082F2C</color>
 
-    <!-- Dark Theme Colors -->
-    <color name="md_theme_dark_primary">#7CD0FF</color>
-    <color name="md_theme_dark_onPrimary">#003549</color>
-    <color name="md_theme_dark_primaryContainer">#004C68</color>
-    <color name="md_theme_dark_onPrimaryContainer">#C3E8FF</color>
-    <color name="md_theme_dark_secondary">#B6C9D8</color>
-    <color name="md_theme_dark_onSecondary">#21323E</color>
-    <color name="md_theme_dark_secondaryContainer">#374955</color>
-    <color name="md_theme_dark_onSecondaryContainer">#D2E5F5</color>
-    <color name="md_theme_dark_tertiary">#CEC1E9</color>
-    <color name="md_theme_dark_onTertiary">#332B4C</color>
-    <color name="md_theme_dark_tertiaryContainer">#4B4163</color>
-    <color name="md_theme_dark_onTertiaryContainer">#E9DDFF</color>
+    <color name="md_theme_light_background">#FFFFFFFF</color>
+    <color name="md_theme_light_onBackground">#121212</color>
+    <color name="md_theme_light_surface">#FFFFFFFF</color>
+    <color name="md_theme_light_onSurface">#121212</color>
+    <color name="md_theme_light_surfaceVariant">#E3F2E6</color>
+    <color name="md_theme_light_outline">#729874</color>
 
-    <!-- Custom App Colors -->
+    <!-- Material You Green Palette (Dark) -->
+    <color name="md_theme_dark_primary">#81C784</color>
+    <color name="md_theme_dark_onPrimary">#103916</color>
+    <color name="md_theme_dark_primaryContainer">#1B5E20</color>
+    <color name="md_theme_dark_onPrimaryContainer">#C8E6C9</color>
+
+    <color name="md_theme_dark_secondary">#AED581</color>
+    <color name="md_theme_dark_onSecondary">#1A2E05</color>
+    <color name="md_theme_dark_secondaryContainer">#33691E</color>
+    <color name="md_theme_dark_onSecondaryContainer">#DCEDC8</color>
+
+    <color name="md_theme_dark_tertiary">#80CBC4</color>
+    <color name="md_theme_dark_onTertiary">#082F2C</color>
+    <color name="md_theme_dark_tertiaryContainer">#004D40</color>
+    <color name="md_theme_dark_onTertiaryContainer">#B2DFDB</color>
+
+    <!-- App custom background tokens -->
+    <color name="colorBackgroundLightGradientStart">#C8FACC</color>
+    <color name="colorBackgroundLightGradientEnd">#A6ECA8</color>
+    <color name="colorBackgroundDark">#000000</color>
+
+    <!-- Legacy/compat colors still referenced -->
     <color name="background_color">#FFFFFF</color>
     <color name="surface_color">#FAFAFA</color>
 
-    <!-- Continue Reading Section Colors -->
+    <!-- SwipeRefreshLayout palette (kept) -->
+    <color name="purple_500">#6200EE</color>
+    <color name="purple_700">#3700B3</color>
+    <color name="teal_200">#03DAC5</color>
+
+    <!-- Continue Reading Section Colors (kept) -->
     <color name="continue_reading_background">#FFE4E1</color>
     <color name="continue_reading_text">#8B0000</color>
     <color name="continue_reading_text_secondary">#CD5C5C</color>
     <color name="continue_reading_button">#DC143C</color>
-
-    <!-- Surface Variants -->
-    <color name="md_theme_light_surfaceVariant">#DEE3EA</color>
-    <color name="md_theme_light_outline">#6F777E</color>
 
     <!-- Utility Colors -->
     <color name="white_50">#80FFFFFF</color>

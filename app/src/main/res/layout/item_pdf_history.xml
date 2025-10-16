@@ -21,6 +21,7 @@
             android:layout_height="64dp"
             android:background="@drawable/pdf_thumbnail_placeholder"
             android:scaleType="centerCrop"
+            android:contentDescription="@null"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -95,18 +96,50 @@
             app:layout_constraintTop_toBottomOf="@+id/progressBar"
             tools:text="Última lectura: hace 3 días" />
 
-        <!-- Delete Button -->
+        <!-- Indicador de archivo inaccesible -->
+        <TextView
+            android:id="@+id/textInaccessible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/pdf_not_found"
+            android:textColor="#F44336"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@+id/textFileName"
+            app:layout_constraintTop_toBottomOf="@+id/progressBar"
+            tools:visibility="visible" />
+
+        <!-- Botón de reubicación -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonRelocate"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-8dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:text="@string/action_relocate"
+            android:textColor="#2196F3"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/buttonDelete"
+            app:layout_constraintTop_toBottomOf="@+id/progressBar"
+            tools:visibility="visible" />
+
+        <!-- Botón de eliminar -->
         <ImageButton
             android:id="@+id/buttonDelete"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Eliminar PDF"
+            android:contentDescription="@string/action_delete"
+            android:padding="8dp"
             android:src="@drawable/ic_delete"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="?attr/colorOnSurfaceVariant" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </com.google.android.material.card.MaterialCardView>

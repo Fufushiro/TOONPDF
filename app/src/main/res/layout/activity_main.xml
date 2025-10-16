@@ -2,175 +2,243 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color">
+    android:fitsSystemWindows="true">
 
-    <!-- Main Content ScrollView -->
-    <androidx.core.widget.NestedScrollView
+    <!-- AppBar con Toolbar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:minHeight="48dp"
+            android:background="@android:color/transparent"
+            app:navigationIcon="@drawable/ic_home"
+            app:titleTextColor="?attr/colorOnBackground"
+            tools:title="PDFTOON" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- SwipeRefreshLayout -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScroll"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="24dp">
+            android:layout_height="match_parent"
+            android:fillViewport="true">
 
-            <!-- Header Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingHorizontal="24dp"
+                android:orientation="vertical"
+                android:paddingTop="24dp"
                 android:paddingBottom="16dp">
 
-                <!-- Greeting and user info -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/textGreeting"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="?attr/colorOnBackground"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        tools:text="Buenas tardes, Usuario" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="¿Qué deseas leer hoy?"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
-
-                <!-- User Avatar -->
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/imageUserAvatar"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_gravity="center_vertical"
-                    android:background="?attr/colorPrimary"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_person"
-                    app:shapeAppearanceOverlay="@style/CircleImageView"
-                    app:tint="?attr/colorOnPrimary" />
-
-            </LinearLayout>
-
-            <!-- Search Bar -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="24dp"
-                android:layout_marginBottom="24dp"
-                app:boxBackgroundMode="filled"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:startIconDrawable="@drawable/ic_search">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editTextSearch"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Buscar PDF o documento"
-                    android:inputType="text" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Continue Reading Section -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardContinueReading"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="24dp"
-                android:layout_marginBottom="24dp"
-                android:visibility="gone"
-                app:cardBackgroundColor="@color/continue_reading_background"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
-
+                <!-- Header Section: Greeting + Avatar (switch removed) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="24dp"
+                    android:paddingBottom="16dp"
+                    android:gravity="center_vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Continuar leyendo"
-                        android:textColor="@color/continue_reading_text"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/textContinueReadingTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:ellipsize="end"
-                        android:maxLines="2"
-                        android:textColor="@color/continue_reading_text"
-                        android:textSize="16sp"
-                        tools:text="Mi Documento PDF.pdf" />
+                        <TextView
+                            android:id="@+id/textGreeting"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="?attr/colorOnBackground"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            tools:text="Buenas tardes, Usuario" />
 
-                    <TextView
-                        android:id="@+id/textContinueReadingProgress"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="@color/continue_reading_text_secondary"
-                        android:textSize="14sp"
-                        tools:text="Página 45 / 120 • 38%" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/prompt_what_to_read"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="14sp" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/buttonContinueReading"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Continuar"
-                        app:backgroundTint="@color/continue_reading_button"
-                        app:cornerRadius="8dp" />
+                    </LinearLayout>
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/imageUserAvatar"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginStart="12dp"
+                        android:background="?attr/colorPrimary"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_person"
+                        app:shapeAppearanceOverlay="@style/CircleImageView"
+                        app:tint="?attr/colorOnPrimary" />
 
                 </LinearLayout>
 
-            </com.google.android.material.card.MaterialCardView>
+                <!-- Search Bar prominent -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="24dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp">
 
-            <!-- Recent PDFs Section -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="8dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginStart="8dp"
+                            android:contentDescription="@string/cd_search"
+                            android:src="@drawable/ic_search"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+
+                        <EditText
+                            android:id="@+id/editTextSearch"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:hint="@string/hint_search_pdfs"
+                            android:importantForAutofill="no"
+                            android:inputType="text"
+                            android:minHeight="0dp"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="6dp"
+                            android:textSize="16sp" />
+
+                        <ImageButton
+                            android:id="@+id/buttonClearSearch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/cd_clear_search"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_clear"
+                            android:visibility="gone"
+                            app:tint="?attr/colorOnSurfaceVariant"
+                            tools:visibility="visible" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Continue Reading Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardContinueReading"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="24dp"
                     android:layout_marginBottom="16dp"
-                    android:text="Documentos recientes"
-                    android:textColor="?attr/colorOnBackground"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    app:cardBackgroundColor="?attr/colorPrimaryContainer"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp"
+                    tools:visibility="visible">
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/title_continue_reading"
+                            android:textColor="?attr/colorOnPrimaryContainer"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/textContinueReadingTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:ellipsize="end"
+                            android:maxLines="2"
+                            android:textColor="?attr/colorOnPrimaryContainer"
+                            android:textSize="14sp"
+                            tools:text="Document.pdf" />
+
+                        <TextView
+                            android:id="@+id/textContinueReadingProgress"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="?attr/colorOnPrimaryContainer"
+                            android:textSize="12sp"
+                            tools:text="Página 25 / 120 • 20%" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/buttonContinueReading"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/title_continue_reading"
+                            app:cornerRadius="16dp" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Recent PDFs Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="24dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/title_pdf_history"
+                        android:textColor="?attr/colorOnBackground"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- PDF History RecyclerView -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewPdfs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
+                    android:clipToPadding="false"
                     android:paddingHorizontal="16dp"
-                    android:paddingBottom="100dp"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:paddingBottom="80dp"
+                    tools:itemCount="3"
                     tools:listitem="@layout/item_pdf_history" />
 
                 <!-- Empty State -->
@@ -178,25 +246,26 @@
                     android:id="@+id/layoutEmptyState"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="48dp"
+                    android:layout_gravity="center"
+                    android:layout_marginHorizontal="32dp"
+                    android:layout_marginTop="80dp"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:paddingHorizontal="48dp"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         android:layout_width="120dp"
                         android:layout_height="120dp"
-                        android:alpha="0.6"
-                        android:src="@drawable/ic_pdf_empty"
-                        app:tint="?attr/colorOnSurfaceVariant" />
+                        android:contentDescription="@string/cd_no_pdfs"
+                        android:src="@drawable/ic_empty_pdf" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:text="No hay documentos"
-                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:text="@string/empty_no_pdfs"
+                        android:textColor="?attr/colorOnBackground"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -205,27 +274,65 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:gravity="center"
-                        android:text="Toca el botón + para agregar tu primer PDF y comenzar a leer"
+                        android:text="@string/empty_tap_to_add"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="14sp" />
 
                 </LinearLayout>
 
             </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- Error Container -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/errorContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_margin="16dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="#FFCDD2"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="6dp"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/textErrorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#B71C1C"
+                android:textSize="12sp"
+                tools:text="Error al cargar PDFs" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonDismissError"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:minHeight="0dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:text="@string/action_acknowledge" />
         </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
-    </androidx.core.widget.NestedScrollView>
-
-    <!-- Floating Action Button -->
+    <!-- FAB for adding new PDF -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddPdf"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:contentDescription="Agregar PDF"
-        app:srcCompat="@drawable/ic_add"
-        app:tint="?attr/colorOnPrimary" />
+        android:layout_margin="24dp"
+        android:contentDescription="@string/cd_add_pdf"
+        android:src="@drawable/ic_add" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

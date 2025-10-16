@@ -1,6 +1,6 @@
 package ia.ankherth.grease
 
-import ia.ankherth.grease.data.PdfHistoryEntity
+import ia.ankherth.grease.data.room.PdfHistoryEntity
 import org.junit.Test
 import org.junit.Assert.*
 import java.util.Date
@@ -65,7 +65,7 @@ class PdfProgressTest {
         assertEquals(0.0f, pdf.progressPercentage, 0.1f)
 
         // Check that lastReadDate is recent (within last minute)
-        val timeDifference = Math.abs(currentTime.time - pdf.lastReadDate.time)
+        val timeDifference = kotlin.math.abs(currentTime.time - Date(pdf.lastReadDate).time)
         assertTrue("Last read date should be recent", timeDifference < 60000) // 1 minute
     }
 

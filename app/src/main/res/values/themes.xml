@@ -1,49 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base application theme. -->
+    <!-- Base application theme (Light) -->
     <style name="Theme.PDFTOON" parent="Theme.Material3.Light.NoActionBar">
-        <!-- Primary brand color. -->
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</item>
-        <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/md_theme_light_secondary</item>
         <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
         <item name="colorSecondaryContainer">@color/md_theme_light_secondaryContainer</item>
         <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
-        <!-- Tertiary brand color. -->
         <item name="colorTertiary">@color/md_theme_light_tertiary</item>
         <item name="colorOnTertiary">@color/md_theme_light_onTertiary</item>
         <item name="colorTertiaryContainer">@color/md_theme_light_tertiaryContainer</item>
         <item name="colorOnTertiaryContainer">@color/md_theme_light_onTertiaryContainer</item>
-        <!-- Status bar color. -->
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+
+        <!-- Transparent system bars; icons dark in light mode -->
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <!-- Navigation bar color. -->
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <!-- Light status bar and navigation bar icons. -->
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
-        <!-- Background colors -->
-        <item name="android:windowBackground">@color/background_color</item>
-        <item name="colorSurface">@color/surface_color</item>
-        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+
+        <!-- Solid white background in light mode (replaces greenish gradient) -->
+        <item name="android:windowBackground">@android:color/white</item>
     </style>
 
-    <!-- Theme for MainActivity - Clean library interface -->
     <style name="Theme.PDFTOON.NoActionBar" parent="Theme.PDFTOON">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
-    <!-- Theme for PdfViewerActivity - Fullscreen capable -->
     <style name="Theme.PDFTOON.Fullscreen" parent="Theme.PDFTOON">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowFullscreen">false</item>
         <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <!-- AMOLED Dark overrides available via ThemeUtils if needed -->
+    <style name="Theme.PDFTOON.Amoled" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:windowBackground">@android:color/black</item>
+        <item name="colorSurface">@android:color/black</item>
+        <item name="colorSurfaceVariant">@android:color/black</item>
+        <item name="colorOnBackground">@color/white</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorPrimary">@color/md_theme_dark_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_dark_onPrimary</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+
+    <style name="Theme.PDFTOON.Amoled.NoActionBar" parent="Theme.PDFTOON.Amoled">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.PDFTOON.Amoled.Fullscreen" parent="Theme.PDFTOON.Amoled">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 </resources>

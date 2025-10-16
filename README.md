@@ -1,257 +1,101 @@
-# PDFTOON v0.1.3
+# PDFTOON v0.3.9
 
 Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblioteca digital", historial persistente y modo de lectura inmersivo.
 
-## 🚀 Características Principales
+## 🚀 ¿Qué hay de nuevo en 0.3.9?
+- Rediseño Material You (Material 3) con paleta verde y degradado en modo claro.
+- Compatibilidad completa tema claro/oscuro con preferencia persistente y aplicada antes de inflar la UI (sin parpadeos).
+- Fondo negro puro en modo oscuro para máximo contraste y accesibilidad; ajuste automático del color de iconos en la barra de estado.
+- Corrección de superposición con la barra de estado usando WindowInsets y padding dinámico.
+- Optimización del APK: R8 minify + shrinkResources, exclusión de META-INF y uso de vector drawables.
+- Mockups de la nueva UI incluidos en assets (no influyen en recursos de la app).
 
-### ✨ Nueva Interfaz Biblioteca Digital
-- **Pantalla principal moderna y limpia** con diseño minimalista
-- **Saludo personalizado** basado en la hora del día
-- **Barra de búsqueda** para encontrar documentos rápidamente
-- **Sección "Continuar leyendo"** que destaca el último PDF abierto
-- **Lista de documentos recientes** con información detallada de progreso
+## ✨ Interfaz Material You
+- Fondo (claro): degradado verde de #C8FACC a #A6ECA8; componentes en blanco/verde con bordes ≥16dp y espaciado 12–24dp.
+- AppBar con icono de inicio y opciones; barra de búsqueda prominente con botón de limpiar.
+- Selector desplegable (AutoCompleteTextView), reproductor simple (play/pause + slider), botones "Seleccionar" y "Guardar".
+- Campos de texto con placeholder “Lorem ipsum”, interruptores y FAB "Agregar PDF" (iconografía vectorial minimalista).
 
-### 📚 Historial Persistente
-- **Base de datos local** que guarda automáticamente todos los PDFs abiertos
-- **Seguimiento de progreso** con última página leída y porcentaje completado
-- **Fecha de última lectura** para cada documento
-- **Continuación automática** desde donde se quedó la lectura
+## 🌓 Tema claro / oscuro
+- Preferencia `pref_dark` en SharedPreferences; se aplica al iniciar con `AppCompatDelegate.setDefaultNightMode(...)` para evitar flicker.
+- Claro: degradado verde; Oscuro: fondo negro (near-black) con texto de alto contraste.
+- Iconos de status bar ajustados según el modo para legibilidad.
 
-### 📖 Visor de PDF Avanzado
-- **Modo de pantalla completa inmersivo** que oculta completamente las barras del sistema
-- **Barra de progreso visual** dentro y fuera del visor
-- **Controles intuitivos** para navegación entre páginas
-- **Información en tiempo real** de página actual y progreso total
-- **Tap para mostrar/ocultar controles** en modo normal
+## 🧭 Status bar e insets
+- Sin superposición con la barra de estado: `ViewCompat.setOnApplyWindowInsetsListener` añade padding superior dinámico al contenedor raíz.
+- `android:windowLightStatusBar` y lógica en tiempo de ejecución aseguran contraste correcto de iconos.
 
-### 🔧 Funcionalidades Técnicas
-- **Storage Access Framework (SAF)** para selección segura de archivos
-- **Arquitectura MVVM** con Room Database para persistencia
-- **Renderizado optimizado** con manejo en segundo plano
-- **Verificación de archivos** con manejo de errores si el PDF fue movido o eliminado
+## 📦 Optimización del APK
+- R8 activado (`minifyEnabled true`) y eliminación de recursos no usados (`shrinkResources true`).
+- Exclusiones de empaquetado: `META-INF/DEPENDENCIES`, `LICENSE`, `NOTICE`, etc.
+- Vector drawables en lugar de PNG donde aplica; conversión a WebP innecesaria (no hay PNGs en res).
+- Mockups movidos a `app/src/main/assets/mockups/` para no romper el merge de recursos.
 
-## 📱 Capturas de Pantalla
+Impacto estimado por optimización (orientativo):
+- R8 + shrinkResources: -10% a -25%.
+- Exclusiones META-INF: -0.2 a -1.0 MB.
+- Uso de vectores vs PNG: -10% a -30% por recurso (ya aplicado).
 
-### Pantalla Principal
-- Interfaz limpia con saludo personalizado
-- Sección "Continuar leyendo" destacada
-- Lista de documentos recientes con progreso visual
+Tamaño actual del APK release (verificado): ~31 MB (`app-release.apk`).
 
-### Visor de PDF
-- Modo normal con controles y barra de progreso
-- Modo pantalla completa inmersivo
-# PDFTOON v0.3.0
+## 🛠️ Instalación y uso
+- Android 10 (API 29) o superior; permisos modernos vía SAF.
+- Biblioteca con historial persistente, saludo personalizado y tarjeta "Continuar leyendo".
 
-Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblioteca digital", historial persistente y modo de lectura inmersivo.
+### Agregar un PDF
+1) Toca el FAB "+". 2) Selecciona un PDF con SAF. 3) Se guarda en la biblioteca y podrás continuar luego.
 
-## 🚀 Características Principales
+### Buscar y filtrar
+- Usa la barra de búsqueda; resultados en tiempo real. Selector con "Todos / Favoritos / Recientes".
 
-### ✨ Nueva Interfaz Biblioteca Digital
-- **Pantalla principal moderna y limpia** con diseño minimalista
-- **Saludo personalizado** basado en la hora del día
-- **Barra de búsqueda** para encontrar documentos rápidamente
-- **Sección "Continuar leyendo"** que destaca el último PDF abierto
-- **Lista de documentos recientes** con información detallada de progreso
+### Tema
+- Cambia el switch de tema en la pantalla principal. La preferencia persiste entre ejecuciones.
 
-### 📚 Historial Persistente
-- **Base de datos local** que guarda automáticamente todos los PDFs abiertos
-- **Seguimiento de progreso** con última página leída y porcentaje completado
-- **Fecha de última lectura** para cada documento
-- **Continuación automática** desde donde se quedó la lectura
+## ⚙️ Compilación y firma
 
-### 📖 Visor de PDF Avanzado
-- **Modo de pantalla completa inmersivo** que oculta completamente las barras del sistema
-- **Barra de progreso visual** dentro y fuera del visor
-- **Controles intuitivos** para navegación entre páginas
-- **Información en tiempo real** de página actual y progreso total
-- **Tap para mostrar/ocultar controles** en modo normal
-
-### 🔧 Funcionalidades Técnicas
-- **Storage Access Framework (SAF)** para selección segura de archivos
-- **Arquitectura MVVM** con Room Database para persistencia
-- **Renderizado optimizado** con manejo en segundo plano
-- **Verificación de archivos** con manejo de errores si el PDF fue movido o eliminado
-
-## 📱 Capturas de Pantalla
-
-### Pantalla Principal
-- Interfaz limpia con saludo personalizado
-- Sección "Continuar leyendo" destacada
-- Lista de documentos recientes con progreso visual
-
-### Visor de PDF
-- Modo normal con controles y barra de progreso
-- Modo pantalla completa inmersivo
-- Información detallada de páginas y porcentaje
-
-## 🛠️ Instalación y Uso
-
-### Requisitos del Sistema
-- Android 10.0 (API nivel 29) o superior
-- Espacio de almacenamiento para la base de datos local
-
-### Cómo Usar la Aplicación
-
-#### 📂 Agregar un PDF
-1. Toca el botón flotante **"+"** en la esquina inferior derecha
-2. Selecciona un archivo PDF desde tu almacenamiento
-3. El PDF se abrirá automáticamente y se guardará en tu biblioteca
-
-#### � Continuar Leyendo
-1. En la pantalla principal, encuentra la tarjeta **"Continuar leyendo"**
-2. Toca **"Continuar"** para reanudar desde la última página leída
-3. El progreso se actualiza automáticamente mientras lees
-
-#### 🔍 Buscar Documentos
-1. Usa la barra de búsqueda en la parte superior
-2. Escribe el nombre del archivo que buscas
-3. Los resultados se filtran en tiempo real
-
-#### 🖥️ Modo Pantalla Completa
-1. Mientras lees un PDF, toca el botón **"Pantalla completa"**
-2. La aplicación ocultará todas las barras del sistema
-3. Toca la pantalla para mostrar temporalmente los controles
-4. Usa el botón atrás o el mismo botón para salir del modo pantalla completa
-
-#### 📊 Ver Progreso
-- **En la lista principal**: Cada PDF muestra una barra de progreso y porcentaje
-- **Dentro del visor**: La barra inferior muestra página actual, total y porcentaje
-- **Información detallada**: "Página X / Y • Z%" en tiempo real
-
-#### 🗑️ Eliminar del Historial
-1. En la lista de documentos, toca el icono de **eliminar** (🗑️)
-2. El PDF se eliminará del historial (no del almacenamiento)
-3. Puedes volver a agregarlo seleccionándolo nuevamente
-
-## 🔁 Cambios en la Versión 0.3.0
-
-### � Añadido
-- Acceso moderno y persistente al almacenamiento con **Storage Access Framework (SAF)**:
-	- Apertura de documentos con permisos de URI persistentes (Android 11–15).
-	- Opción de acceso a carpeta mediante "Abrir carpeta" en Ajustes para permisos de largo plazo.
-- Pantalla de **Ajustes** con:
-	- Nombre de usuario para personalizar el saludo.
-	- Selector de tema: Sistema, Claro, Oscuro y **AMOLED** (negro puro) con preferencia persistente.
-	- Selector de avatar: cambia la foto de inicio en cualquier momento; se mantiene entre reinicios.
-- Tema oscuro **AMOLED** con fondos negros puros y texto de alto contraste.
-
-### � Cambiado
-- Reemplazo de prompts de permisos heredados por los diálogos oficiales del sistema Android.
-- Mejora del contraste de la UI principal y uso consistente de colores del tema.
-- El saludo ahora usa el nombre configurado por el usuario (ej. "Buenos días, Ana").
-
-### � Corregido
-- Problemas de permisos de almacenamiento que no persistían o no eran visibles en ajustes del sistema.
-- Imposibilidad de modificar la foto de inicio tras agregarla una vez.
-- Varias incidencias menores de estabilidad y accesibilidad al abrir o reubicar PDFs.
-
-### ✅ Compatibilidad
-- Comportamiento verificado en Android 11 (API 30) hasta Android 15 (API 35) usando SAF.
-- Evita permisos restringidos por Play Store; no requiere READ_EXTERNAL_STORAGE legado.
-
-### 🧑‍� Notas para desarrolladores
-- Claves de DataStore añadidas: `app_theme`, `user_name`, `user_avatar_uri`, `storage_tree_uri`.
-- El tema se aplica tempranamente en las Activities mediante `ThemeUtils.applyTheme(...)`.
-
-## ⚙️ Arquitectura Técnica
-
-### 🏗️ Patrón MVVM
-```
-MainActivity ↔ MainViewModel ↔ PdfRepository ↔ PdfHistoryDao ↔ Room Database
-PdfViewerActivity ↔ MainViewModel
-```
-
-### � Base de Datos
-- **Room Database** con entidad `PdfHistoryEntity`
-- **Campos**: URI, nombre, páginas totales, última página, fecha, tamaño
-- **Operaciones**: CRUD completo con LiveData para actualizaciones reactivas
-
-### 🎯 Componentes Principales
-- **MainActivity**: Pantalla biblioteca con lista de PDFs
-- **PdfViewerActivity**: Visor con modo pantalla completa
-- **PdfHistoryAdapter**: RecyclerView adapter con DiffUtil
-- **MainViewModel**: Lógica de negocio y manejo de datos
-
-## 🧪 Testing
-
-### ✅ Tests Unitarios
-- **Cálculo de porcentajes** de progreso de lectura
-- **Validación de entidades** PDF con diferentes escenarios
-- **Casos edge** como documentos vacíos o páginas únicas
-
-### 🔬 Tests Instrumentados
-- **Operaciones de base de datos** con Room testing
-- **Inserción, actualización y eliminación** de registros
-- **Ordenamiento por fecha** y recuperación de datos
-- **Casos de reemplazo** y manejo de duplicados
-
-## � Permisos
-
-La aplicación utiliza permisos modernos y seguros:
-- `READ_MEDIA_DOCUMENTS` (Android 13+)
-- `READ_EXTERNAL_STORAGE` (hasta Android 12)
-
-## 🛠️ Compilación
-
-### Requisitos de Desarrollo
-- Android Studio Hedgehog o superior
-- Kotlin 1.9+
-- Gradle 8.0+
-- SDK mínimo: Android 10 (API 29)
-- SDK objetivo: Android 14 (API 36)
-
-### Dependencias Principales
-- **Material Design 3** para UI moderna
-- **Room Database** para persistencia local
-- **Lifecycle & ViewModel** para arquitectura MVVM
-- **android-pdf-viewer** para renderizado de PDF
-
-### Build y firma de APK
-
-Puedes generar el APK de release directamente desde consola:
-
+### Comandos rápidos
 ```bash
-./gradlew clean assembleRelease
+./gradlew clean assembleRelease -x lint -x test
+ls -lh app/build/outputs/apk/release/
+```
+- Artefacto: `app/build/outputs/apk/release/app-release.apk` (≈31 MB).
+- Firma: si `keystore/keystore.properties` existe y es válido, se firma con tu keystore; si no, fallback a debug keystore (para no romper el build de pruebas).
+
+Para AAB:
+```bash
+./gradlew bundleRelease
+ls -lh app/build/outputs/bundle/release/
 ```
 
-Salida esperada: el archivo `app/build/outputs/apk/release/app-release.apk`.
-
-- Si existe `keystore/keystore.properties` con credenciales válidas, el APK se firma con tu keystore.
-- Si NO existe, el build usa la firma de debug como fallback para que igualmente obtengas un APK firmado para pruebas.
-
-Para configurar tu propia firma:
-
-1. Crea/copia tu keystore (JKS) en `keystore/` (por ejemplo `keystore/KEYSTORE.jks`).
-2. Crea el archivo `keystore/keystore.properties` a partir del ejemplo:
-
+### Configurar firma (opcional)
+1) Copia tu JKS a `keystore/KEYSTORE.jks`.
+2) Crea `keystore/keystore.properties` desde el ejemplo:
 ```properties
-# keystore/keystore.properties
 storeFile=keystore/KEYSTORE.jks
 storePassword=TU_PASSWORD
 keyAlias=TU_ALIAS
 keyPassword=TU_PASSWORD_ALIAS
 ```
+3) Vuelve a compilar con `assembleRelease`.
 
-3. Vuelve a compilar:
+## 📁 Mockups
+- `app/src/main/assets/mockups/mockup_ui_light.svg`
+- `app/src/main/assets/mockup_ui_dark.svg`
 
-```bash
-./gradlew clean assembleRelease
-```
+## 🧩 Arquitectura (resumen)
+- MVVM con Room, LiveData/ViewModel, SAF para acceso a archivos, y `android-pdf-viewer` para renderizado.
 
-### Tests y Lint
-
-Ejecutar tests unitarios y lint crítico de release:
-
+## 🧪 Tests y Lint
 ```bash
 ./gradlew testReleaseUnitTest
 ./gradlew lintVitalRelease
 ```
 
-Nota: Se migró Room a KSP para builds más rápidos y se centralizaron dependencias en el catálogo de versiones (gradle/libs.versions.toml).
+## 🛡️ Accesibilidad
+- Contraste AA/AAA cuando es posible, y objetivos táctiles ≥48dp para botones.
 
 ## 📄 Licencia
-
-Este proyecto está bajo la licencia MIT. Ver `LICENSE` para más detalles.
+MIT. Ver `LICENSE`.
 
 ## 🤝 Contribución
 
@@ -272,4 +116,4 @@ Para reportar bugs o solicitar features, crear un issue en GitHub con:
 
 ---
 
-**PDFTOON v0.3.0** - Una experiencia de lectura de PDF moderna y completa para Android.
+**PDFTOON v0.3.9** - Una experiencia de lectura de PDF moderna y completa para Android.

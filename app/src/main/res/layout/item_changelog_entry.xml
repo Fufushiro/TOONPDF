@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="8dp">
+
+    <!-- Tipo de cambio (icon) -->
+    <ImageView
+        android:id="@+id/imageChangeType"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:contentDescription="@null"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_feature" />
+
+    <!-- Versión -->
+    <TextView
+        android:id="@+id/textVersion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/imageChangeType"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="v0.1.3" />
+
+    <!-- Fecha -->
+    <TextView
+        android:id="@+id/textDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/textVersion"
+        app:layout_constraintTop_toTopOf="@+id/textVersion"
+        tools:text="15/10/2025" />
+
+    <!-- Descripción del cambio -->
+    <TextView
+        android:id="@+id/textChangeDescription"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/textVersion"
+        app:layout_constraintTop_toBottomOf="@+id/textVersion"
+        tools:text="Implementada persistencia de PDFs abiertos para recordar la última posición de lectura" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

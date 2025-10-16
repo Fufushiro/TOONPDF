@@ -1,16 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/menu_settings"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:orderInCategory="10"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_changelog"
-        android:title="Historial de cambios"
+        android:title="@string/menu_changelog"
         android:orderInCategory="100"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_about"
-        android:title="Acerca de"
+        android:title="@string/menu_about"
         android:orderInCategory="101"
         app:showAsAction="never" />
 </menu>

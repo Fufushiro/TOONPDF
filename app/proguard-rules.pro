@@ -19,3 +19,15 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Project-specific ProGuard/R8 rules
+
+-keep class ia.ankherth.grease.** { *; }
+-keepclassmembers class * implements android.os.Parcelable { public static final ** CREATOR; }
+
+# Room keeps (DAO/Entities often accessed via reflection)
+-keep class androidx.room.** { *; }
+-keep class * extends androidx.room.RoomDatabase { *; }
+
+# Gson model classes: keep fields for serialization (adjust if needed)
+-keepclassmembers class ia.ankherth.grease.** { *; }

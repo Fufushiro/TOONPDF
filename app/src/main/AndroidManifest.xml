@@ -2,11 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.READ_MEDIA_DOCUMENTS" />
-
     <application
+        android:name=".PDFTOONApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -39,6 +36,20 @@
             android:theme="@style/Theme.PDFTOON.Fullscreen"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:screenOrientation="unspecified" />
+
+        <!-- Settings Activity -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="Ajustes"
+            android:theme="@style/Theme.PDFTOON.NoActionBar" />
+
+        <!-- Changelog Activity -->
+        <activity
+            android:name=".ChangelogActivity"
+            android:exported="false"
+            android:theme="@style/Theme.PDFTOON.NoActionBar"
+            android:label="Historial de cambios" />
 
     </application>
 

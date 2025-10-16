@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="Perfil">
+        <EditTextPreference
+            android:key="pref_user_name"
+            android:title="Nombre de usuario"
+            app:useSimpleSummaryProvider="true"
+            android:dialogTitle="Escribe tu nombre" />
+        <Preference
+            android:key="pref_user_avatar"
+            android:title="Cambiar foto de inicio"
+            android:summary="Selecciona una imagen de tu galería" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Apariencia">
+        <ListPreference
+            android:key="pref_app_theme"
+            android:title="Tema de la aplicación"
+            android:entries="@array/pref_theme_entries"
+            android:entryValues="@array/pref_theme_values"
+            android:defaultValue="system"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Almacenamiento">
+        <SwitchPreferenceCompat
+            android:key="pref_storage_access"
+            android:title="Acceso a carpeta"
+            android:summaryOn="Permiso concedido para acceder a una carpeta"
+            android:summaryOff="Concede permiso para acceder a una carpeta y localizar PDFs"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+</PreferenceScreen>

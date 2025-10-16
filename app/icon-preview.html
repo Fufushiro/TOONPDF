@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vista previa del icono - PDFTOON</title>
+  <style>
+    :root { --tile: 10px; --c1: #eee; --c2: #ddd; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif; margin: 24px; }
+    .checker {
+      background: linear-gradient(45deg, var(--c1) 25%, transparent 25%),
+                  linear-gradient(-45deg, var(--c1) 25%, transparent 25%),
+                  linear-gradient(45deg, transparent 75%, var(--c1) 75%),
+                  linear-gradient(-45deg, transparent 75%, var(--c1) 75%);
+      background-size: calc(var(--tile) * 2) calc(var(--tile) * 2);
+      background-position: 0 0, 0 var(--tile), var(--tile) -var(--tile), -var(--tile) 0;
+      background-color: var(--c2);
+      padding: 16px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+    h1 { margin: 0 0 8px; font-size: 20px; }
+    p { color: #444; margin: 0 0 16px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
+    figure { margin: 0; }
+    figcaption { margin-top: 8px; color: #333; font-size: 14px; }
+    img { width: 192px; height: 192px; image-rendering: -webkit-optimize-contrast; }
+    .note { margin-top: 16px; color: #555; font-size: 13px; }
+    code { background: #f5f5f5; padding: 2px 6px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h1>Vista previa del icono de la app</h1>
+  <p>Estos son los bitmaps ya exportados por Android (mipmap <code>xxxhdpi</code>), tal como se verán en el launcher.</p>
+
+  <div class="grid">
+    <figure>
+      <div class="checker">
+        <img src="src/main/res/mipmap-xxxhdpi/ic_launcher.webp" alt="Icono cuadrado" />
+      </div>
+      <figcaption>Cuadrado (ic_launcher.webp, xxxhdpi)</figcaption>
+    </figure>
+
+    <figure>
+      <div class="checker">
+        <img src="src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" alt="Icono redondo" />
+      </div>
+      <figcaption>Redondo (ic_launcher_round.webp, xxxhdpi)</figcaption>
+    </figure>
+  </div>
+
+  <div class="note">
+    <p>Definición del icono adaptable:</p>
+    <ul>
+      <li>Background: <code>@drawable/ic_launcher_background</code> (fondo blanco)</li>
+      <li>Foreground: <code>@drawable/ic_launcher_foreground</code> (marca en color teal con recorte blanco)</li>
+    </ul>
+    <p>Puedes abrir directamente los archivos bitmap si lo prefieres:<br>
+      <code>app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp</code><br>
+      <code>app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp</code>
+    </p>
+  </div>
+</body>
+</html>
+

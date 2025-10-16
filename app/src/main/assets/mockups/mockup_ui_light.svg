@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#C8FACC"/>
+      <stop offset="100%" stop-color="#A6ECA8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#grad)"/>
+  <rect x="32" y="64" width="1016" height="96" rx="24" fill="rgba(255,255,255,0.6)"/>
+  <rect x="32" y="200" width="1016" height="72" rx="24" fill="#FFFFFF"/>
+  <rect x="32" y="296" width="1016" height="120" rx="16" fill="#FFFFFF"/>
+  <circle cx="96" cy="356" r="28" fill="#2E7D32"/>
+  <rect x="160" y="344" width="840" height="24" rx="12" fill="#C5E1A5"/>
+  <rect x="32" y="440" width="496" height="64" rx="16" fill="#2E7D32"/>
+  <rect x="552" y="440" width="496" height="64" rx="16" fill="#66BB6A"/>
+  <rect x="32" y="536" width="1016" height="64" rx="16" fill="#FFFFFF"/>
+  <rect x="32" y="616" width="1016" height="64" rx="16" fill="#FFFFFF"/>
+  <rect x="32" y="704" width="1016" height="160" rx="16" fill="#A5D6A7"/>
+</svg>
+
