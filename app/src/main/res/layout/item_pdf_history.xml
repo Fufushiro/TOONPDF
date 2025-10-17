@@ -1,145 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardPdfItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
-    app:strokeWidth="0dp">
+    app:cardCornerRadius="14dp"
+    app:cardElevation="4dp"
+    app:cardUseCompatPadding="true"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@color/md_theme_light_surfaceVariant">
 
-        <!-- PDF Thumbnail placeholder -->
-        <ImageView
-            android:id="@+id/imageThumbnail"
-            android:layout_width="48dp"
-            android:layout_height="64dp"
-            android:background="@drawable/pdf_thumbnail_placeholder"
-            android:scaleType="centerCrop"
-            android:contentDescription="@null"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <!-- Vista previa del PDF -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="80dp"
+            android:layout_height="100dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="2dp"
+            android:layout_marginEnd="12dp">
 
-        <!-- File Name -->
-        <TextView
-            android:id="@+id/textFileName"
+            <ImageView
+                android:id="@+id/ivPdfPreview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="@color/md_theme_light_surface"
+                android:contentDescription="Vista previa del PDF" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Contenido de texto -->
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="8dp"
-            android:ellipsize="end"
-            android:maxLines="2"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/buttonDelete"
-            app:layout_constraintStart_toEndOf="@+id/imageThumbnail"
-            app:layout_constraintTop_toTopOf="@+id/imageThumbnail"
-            tools:text="Document.pdf" />
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical">
 
-        <!-- Page Info -->
-        <TextView
-            android:id="@+id/textPageInfo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="@+id/textFileName"
-            app:layout_constraintStart_toStartOf="@+id/textFileName"
-            app:layout_constraintTop_toBottomOf="@+id/textFileName"
-            tools:text="Página 25 / 120" />
+            <!-- Título del PDF -->
+            <TextView
+                android:id="@+id/tvPdfTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Documento.pdf"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/md_theme_light_onSurface"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="2"
+                android:ellipsize="end" />
 
-        <!-- Progress Bar -->
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="0dp"
-            android:layout_height="4dp"
-            android:layout_marginTop="8dp"
-            android:progressTint="?attr/colorPrimary"
-            app:layout_constraintEnd_toStartOf="@+id/textProgress"
-            app:layout_constraintStart_toStartOf="@+id/textPageInfo"
-            app:layout_constraintTop_toBottomOf="@+id/textPageInfo"
-            tools:progress="45" />
+            <!-- Metadata -->
+            <TextView
+                android:id="@+id/tvPdfMeta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Página 10 de 50 • hace 2 h"
+                android:textSize="13sp"
+                android:textColor="@color/md_theme_light_outline"
+                android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif" />
 
-        <!-- Progress Percentage -->
-        <TextView
-            android:id="@+id/textProgress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textColor="?attr/colorPrimary"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/progressBar"
-            app:layout_constraintEnd_toEndOf="@+id/textFileName"
-            app:layout_constraintTop_toTopOf="@+id/progressBar"
-            tools:text="45%" />
+            <!-- Barra de progreso con porcentaje -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical">
 
-        <!-- Last Read Date -->
-        <TextView
-            android:id="@+id/textLastRead"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="11sp"
-            app:layout_constraintBottom_toBottomOf="@+id/imageThumbnail"
-            app:layout_constraintEnd_toEndOf="@+id/textProgress"
-            app:layout_constraintStart_toStartOf="@+id/progressBar"
-            app:layout_constraintTop_toBottomOf="@+id/progressBar"
-            tools:text="Última lectura: hace 3 días" />
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="8dp"
+                    android:layout_weight="1"
+                    android:progressDrawable="@drawable/progress_drawable_rounded"
+                    android:progress="20"
+                    android:max="100" />
 
-        <!-- Indicador de archivo inaccesible -->
-        <TextView
-            android:id="@+id/textInaccessible"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/pdf_not_found"
-            android:textColor="#F44336"
-            android:textSize="12sp"
-            android:textStyle="italic"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="@+id/textFileName"
-            app:layout_constraintTop_toBottomOf="@+id/progressBar"
-            tools:visibility="visible" />
+                <TextView
+                    android:id="@+id/tvProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="20%"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/md_theme_light_primary"
+                    android:layout_marginStart="10dp"
+                    android:fontFamily="sans-serif-medium" />
 
-        <!-- Botón de reubicación -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonRelocate"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="-8dp"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:text="@string/action_relocate"
-            android:textColor="#2196F3"
-            android:textSize="12sp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toStartOf="@+id/buttonDelete"
-            app:layout_constraintTop_toBottomOf="@+id/progressBar"
-            tools:visibility="visible" />
+            </LinearLayout>
 
-        <!-- Botón de eliminar -->
-        <ImageButton
-            android:id="@+id/buttonDelete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/action_delete"
-            android:padding="8dp"
-            android:src="@drawable/ic_delete"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="?attr/colorOnSurfaceVariant" />
+        </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

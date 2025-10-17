@@ -23,12 +23,12 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Almacenamiento">
+    <PreferenceCategory android:title="Interacción">
         <SwitchPreferenceCompat
-            android:key="pref_storage_access"
-            android:title="Acceso a carpeta"
-            android:summaryOn="Permiso concedido para acceder a una carpeta"
-            android:summaryOff="Concede permiso para acceder a una carpeta y localizar PDFs"
-            android:defaultValue="false" />
+            android:key="pref_haptics"
+            android:title="Vibración al pulsar"
+            android:summaryOn="Las acciones producirán una ligera vibración"
+            android:summaryOff="Desactivado"
+            android:defaultValue="true" />
     </PreferenceCategory>
 </PreferenceScreen>

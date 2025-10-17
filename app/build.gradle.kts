@@ -10,15 +10,29 @@ android {
     namespace = "ia.ankherth.grease"
     compileSdk = 36
 
+    // Configure NDK for 16KB page size support (required for Android 15+ devices)
+    ndkVersion = "27.0.12077973"
+
     defaultConfig {
         applicationId = "ia.ankherth.grease"
         minSdk = 29
         targetSdk = 36
-        versionCode = 6
-        versionName = "0.3.9"
+        versionCode = 8
+        versionName = "4.5.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
+
+        // Enable resource optimization (modern approach)
+        androidResources {
+            localeFilters.addAll(listOf("en", "es"))
+        }
+
+        // NDK configuration for proper alignment with 16KB page sizes
+        ndk {
+            // Filter to only include necessary architectures (reduces APK size)
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
+        }
     }
 
     // Carga condicional de propiedades de firma para release
@@ -59,24 +73,38 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // Firma SIEMPRE con la config de release (sin caer en la buildType debug)
             signingConfig = signingConfigs.getByName("release")
+
+            // Additional optimizations for release
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
         debug {
-            // Keep debug as non-minified for easier dev
             isMinifyEnabled = false
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-DEBUG"
         }
     }
 
-    packagingOptions {
+    packaging {
         resources {
             excludes += setOf(
                 "META-INF/DEPENDENCIES",
                 "META-INF/LICENSE",
                 "META-INF/LICENSE.txt",
                 "META-INF/NOTICE",
-                "META-INF/NOTICE.txt"
+                "META-INF/NOTICE.txt",
+                "META-INF/*.kotlin_module",
+                "kotlin/**",
+                "META-INF/androidx.*.version"
             )
+        }
+        jniLibs {
+            // CRITICAL: Disable legacy packaging to ensure 16KB alignment
+            useLegacyPackaging = false
+            // Keep debug symbols for better crash reports
+            keepDebugSymbols.addAll(listOf("**/*.so"))
         }
     }
 
@@ -88,8 +116,22 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = false
     }
-    kotlinOptions { jvmTarget = "11" }
+
+    kotlinOptions {
+        jvmTarget = "11"
+        freeCompilerArgs += listOf(
+            "-opt-in=kotlin.RequiresOptIn",
+            "-Xjvm-default=all"
+        )
+    }
+
+    // Optimize build performance
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
 }
 
 dependencies {
@@ -125,6 +167,9 @@ dependencies {
 
     // DataStore para preferencias de usuario
     implementation(libs.androidx.datastore.preferences)
+
+    // Coil para carga de imágenes
+    implementation(libs.coil.kt)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

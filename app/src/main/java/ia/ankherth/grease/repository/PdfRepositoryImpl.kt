@@ -1,11 +1,14 @@
 package ia.ankherth.grease.repository
 
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import ia.ankherth.grease.data.room.AppDatabase
 import ia.ankherth.grease.data.room.PdfHistoryDao
 import ia.ankherth.grease.data.room.PdfHistoryEntity
 import ia.ankherth.grease.data.preferences.UserPreferencesManager
+import ia.ankherth.grease.util.HistoryExportImport
+import ia.ankherth.grease.util.PdfThumbnailGenerator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
@@ -32,12 +35,14 @@ class PdfRepositoryImpl(private val context: Context) {
     val userName: Flow<String?> = preferencesManager.userName
     val userAvatarUri: Flow<String?> = preferencesManager.userAvatarUri
     val storageTreeUri: Flow<String?> = preferencesManager.storageTreeUri
+    val hapticsEnabled: Flow<Boolean> = preferencesManager.hapticsEnabled
 
     /** Preferencias: setters **/
     suspend fun setAppTheme(theme: String) = preferencesManager.setAppTheme(theme)
     suspend fun setUserName(name: String?) = preferencesManager.setUserName(name)
     suspend fun setUserAvatarUri(uri: String?) = preferencesManager.setUserAvatarUri(uri)
     suspend fun setStorageTreeUri(uri: String?) = preferencesManager.setStorageTreeUri(uri)
+    suspend fun setHapticsEnabled(enabled: Boolean) = preferencesManager.setHapticsEnabled(enabled)
 
     /**
      * Agrega o actualiza un PDF en el historial
@@ -46,24 +51,29 @@ class PdfRepositoryImpl(private val context: Context) {
      * @param totalPages Número total de páginas
      * @param currentPage Página actual (por defecto 0)
      * @param filePath Ruta opcional del archivo para facilitar la reubicación
+     * @param scrollOffset Desplazamiento de scroll para reanudar lectura
      */
     suspend fun addOrUpdatePdf(
         uri: String,
         fileName: String,
         totalPages: Int,
         currentPage: Int = 0,
-        filePath: String? = null
+        filePath: String? = null,
+        scrollOffset: Float = 0f
     ) {
         val existingPdf = pdfDao.getPdfByUri(uri)
+        val thumbnailPath = PdfThumbnailGenerator.generateThumbnail(context, Uri.parse(uri))
 
         if (existingPdf != null) {
             // Actualizar PDF existente
             val updatedPdf = existingPdf.copy(
                 lastPageRead = currentPage,
+                scrollOffset = scrollOffset,
                 lastReadDate = System.currentTimeMillis(),
                 fileName = fileName,
                 totalPages = totalPages,
                 filePath = filePath ?: existingPdf.filePath,
+                thumbnailPath = thumbnailPath ?: existingPdf.thumbnailPath,
                 isAccessible = true
             )
             pdfDao.update(updatedPdf)
@@ -74,8 +84,10 @@ class PdfRepositoryImpl(private val context: Context) {
                 fileName = fileName,
                 totalPages = totalPages,
                 lastPageRead = currentPage,
+                scrollOffset = scrollOffset,
                 lastReadDate = System.currentTimeMillis(),
                 filePath = filePath,
+                thumbnailPath = thumbnailPath,
                 isAccessible = true
             )
             pdfDao.insert(newPdf)
@@ -89,9 +101,10 @@ class PdfRepositoryImpl(private val context: Context) {
      * Actualiza el progreso de lectura de un PDF
      * @param uri URI del PDF
      * @param pageNumber Número de página actual
+     * @param scrollOffset Desplazamiento de scroll actual
      */
-    suspend fun updateProgress(uri: String, pageNumber: Int) {
-        pdfDao.updateProgress(uri, pageNumber, System.currentTimeMillis())
+    suspend fun updateProgress(uri: String, pageNumber: Int, scrollOffset: Float = 0f) {
+        pdfDao.updateProgress(uri, pageNumber, scrollOffset, System.currentTimeMillis())
     }
 
     /**
@@ -108,11 +121,69 @@ class PdfRepositoryImpl(private val context: Context) {
     }
 
     /**
+     * Limpia todo el historial
+     */
+    suspend fun clearAllHistory() {
+        pdfDao.clearAllHistory()
+        preferencesManager.saveLastOpenedPdfUri(null)
+    }
+
+    /**
+     * Actualiza el estado de favorito de un PDF
+     * @param uri URI del PDF
+     * @param isFavorite Indica si el PDF es favorito
+     */
+    suspend fun updateFavorite(uri: String, isFavorite: Boolean) {
+        pdfDao.updateFavorite(uri, isFavorite)
+    }
+
+    /**
+     * Obtiene los PDFs favoritos
+     * @return LiveData con la lista de PDFs favoritos
+     */
+    fun getFavoritePdfs(): LiveData<List<PdfHistoryEntity>> {
+        return pdfDao.getFavoritePdfs()
+    }
+
+    /**
+     * Exporta el historial a JSON
+     * @param outputUri URI de salida para el archivo JSON
+     * @return Resultado de la operación de exportación
+     */
+    suspend fun exportHistory(outputUri: Uri): Result<String> {
+        val historyList = pdfDao.getAllPdfsList()
+        return HistoryExportImport.exportHistory(context, historyList, outputUri)
+    }
+
+    /**
+     * Importa el historial desde JSON
+     * @param inputUri URI de entrada del archivo JSON
+     * @return Resultado de la operación de importación
+     */
+    suspend fun importHistory(inputUri: Uri): Result<Int> {
+        val result = HistoryExportImport.importHistory(context, inputUri)
+
+        return if (result.isSuccess) {
+            val historyList = result.getOrNull() ?: emptyList()
+            historyList.forEach { pdf ->
+                pdfDao.insert(pdf)
+            }
+            Result.success(historyList.size)
+        } else {
+            Result.failure(result.exceptionOrNull() ?: Exception("Error desconocido"))
+        }
+    }
+
+    /**
      * Obtiene el PDF más reciente del historial
      * @return La entidad del PDF más reciente o null si no hay historial
      */
     suspend fun getMostRecentPdf(): PdfHistoryEntity? {
         return pdfDao.getMostRecentPdf()
+    }
+
+    suspend fun getPdfByUri(uri: String): PdfHistoryEntity? {
+        return pdfDao.getPdfByUri(uri)
     }
 
     /**

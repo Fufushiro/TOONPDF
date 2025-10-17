@@ -26,8 +26,11 @@ interface PdfHistoryDao {
     @Query("DELETE FROM pdf_history WHERE uri = :uri")
     suspend fun deleteByUri(uri: String)
 
-    @Query("UPDATE pdf_history SET lastPageRead = :lastPageRead, lastReadDate = :lastReadDate WHERE uri = :uri")
-    suspend fun updateProgress(uri: String, lastPageRead: Int, lastReadDate: Long = System.currentTimeMillis())
+    @Query("DELETE FROM pdf_history")
+    suspend fun clearAllHistory()
+
+    @Query("UPDATE pdf_history SET lastPageRead = :lastPageRead, scrollOffset = :scrollOffset, lastReadDate = :lastReadDate WHERE uri = :uri")
+    suspend fun updateProgress(uri: String, lastPageRead: Int, scrollOffset: Float = 0f, lastReadDate: Long = System.currentTimeMillis())
 
     @Query("SELECT * FROM pdf_history WHERE uri = :uri")
     suspend fun getPdfByUri(uri: String): PdfHistoryEntity?
@@ -37,4 +40,13 @@ interface PdfHistoryDao {
 
     @Query("UPDATE pdf_history SET isAccessible = :isAccessible WHERE uri = :uri")
     suspend fun updateAccessibility(uri: String, isAccessible: Boolean)
+
+    @Query("UPDATE pdf_history SET isFavorite = :isFavorite WHERE uri = :uri")
+    suspend fun updateFavorite(uri: String, isFavorite: Boolean)
+
+    @Query("SELECT * FROM pdf_history WHERE isFavorite = 1 ORDER BY lastReadDate DESC")
+    fun getFavoritePdfs(): LiveData<List<PdfHistoryEntity>>
+
+    @Query("SELECT * FROM pdf_history ORDER BY lastReadDate DESC")
+    suspend fun getAllPdfsList(): List<PdfHistoryEntity>
 }

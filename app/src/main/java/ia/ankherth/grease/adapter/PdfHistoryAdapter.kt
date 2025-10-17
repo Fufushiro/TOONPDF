@@ -3,82 +3,98 @@ package ia.ankherth.grease.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import ia.ankherth.grease.R
 import ia.ankherth.grease.data.room.PdfHistoryEntity
-import ia.ankherth.grease.databinding.ItemPdfHistoryBinding
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * Adaptador mejorado para mostrar el historial de PDFs
- * Incluye funcionalidad para gestionar PDFs inaccesibles y opciones para reubicación
+ * Adaptador compacto para mostrar el historial de PDFs
  */
 class PdfHistoryAdapter(
     private val onPdfClick: (PdfHistoryEntity) -> Unit,
     private val onDeleteClick: (PdfHistoryEntity) -> Unit,
-    private val onRelocateClick: (PdfHistoryEntity) -> Unit
+    private val onRelocateClick: (PdfHistoryEntity) -> Unit,
+    private val onLongPressDelete: ((PdfHistoryEntity) -> Unit)? = null
 ) : ListAdapter<PdfHistoryEntity, PdfHistoryAdapter.PdfViewHolder>(PdfDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PdfViewHolder {
-        val binding = ItemPdfHistoryBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-        return PdfViewHolder(binding)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_pdf_history, parent, false)
+        return PdfViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: PdfViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    inner class PdfViewHolder(private val binding: ItemPdfHistoryBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    inner class PdfViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        // Updated to use the correct view IDs from our new layout
+        private val ivPdfPreview: ImageView = itemView.findViewById(R.id.ivPdfPreview)
+        private val tvPdfTitle: TextView = itemView.findViewById(R.id.tvPdfTitle)
+        private val tvPdfMeta: TextView = itemView.findViewById(R.id.tvPdfMeta)
+        private val progressBar: ProgressBar = itemView.findViewById(R.id.progressBar)
+        private val tvProgress: TextView = itemView.findViewById(R.id.tvProgress)
 
         fun bind(pdf: PdfHistoryEntity) {
-            binding.apply {
-                // Configurar información básica del PDF
-                textFileName.text = pdf.fileName
-                textPageInfo.text = "Página ${pdf.lastPageRead + 1} / ${pdf.totalPages}"
-                textLastRead.text = "Última lectura: ${getRelativeTime(pdf.lastReadDate)}"
+            tvPdfTitle.text = pdf.fileName
 
-                // Configurar barra de progreso
-                val progress = pdf.progressPercentage.toInt()
-                progressBar.progress = progress
-                textProgress.text = "${progress}%"
-
-                // Mostrar indicador de accesibilidad si el archivo no es accesible
-                if (!pdf.isAccessible) {
-                    textInaccessible.visibility = View.VISIBLE
-                    buttonRelocate.visibility = View.VISIBLE
-                    root.alpha = 0.7f
-                } else {
-                    textInaccessible.visibility = View.GONE
-                    buttonRelocate.visibility = View.GONE
-                    root.alpha = 1.0f
+            // Cargar miniatura si existe
+            pdf.thumbnailPath?.let { path ->
+                ivPdfPreview.load(File(path)) {
+                    crossfade(true)
+                    placeholder(R.drawable.pdf_thumbnail_placeholder)
+                    error(R.drawable.pdf_thumbnail_placeholder)
                 }
+            } ?: ivPdfPreview.setImageResource(R.drawable.pdf_thumbnail_placeholder)
 
-                // Configurar listeners de clics
-                root.setOnClickListener { onPdfClick(pdf) }
-                buttonDelete.setOnClickListener { onDeleteClick(pdf) }
-                buttonRelocate.setOnClickListener { onRelocateClick(pdf) }
+
+            // Mostrar progreso y última lectura
+            val progressText = if (pdf.totalPages > 0) {
+                val percentage = ((pdf.lastPageRead.toFloat() / pdf.totalPages) * 100).toInt()
+                progressBar.progress = percentage
+                tvProgress.text = "$percentage%"
+                "Página ${pdf.lastPageRead + 1} de ${pdf.totalPages} • ${getRelativeTime(pdf.lastReadDate)}"
+            } else {
+                progressBar.progress = 0
+                tvProgress.text = "0%"
+                "Página ${pdf.lastPageRead + 1} • ${getRelativeTime(pdf.lastReadDate)}"
+            }
+            tvPdfMeta.text = progressText
+
+            // Click listeners
+            itemView.setOnClickListener { onPdfClick(pdf) }
+
+            // Long-press listener para eliminar del historial
+            itemView.setOnLongClickListener {
+                itemView.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+                onLongPressDelete?.invoke(pdf) ?: onDeleteClick(pdf)
+                true
             }
         }
 
         private fun getRelativeTime(timestamp: Long): String {
-            val date = Date(timestamp)
-            val now = Date()
-            val diffInMillis = now.time - date.time
-            val diffInDays = diffInMillis / (24 * 60 * 60 * 1000)
+            val now = System.currentTimeMillis()
+            val diff = now - timestamp
 
             return when {
-                diffInDays == 0L -> "Hoy"
-                diffInDays == 1L -> "Ayer"
-                diffInDays < 7 -> "hace ${diffInDays} días"
-                diffInDays < 30 -> "hace ${diffInDays / 7} semanas"
-                else -> SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date)
+                diff < 60_000 -> "Ahora"
+                diff < 3600_000 -> "Hace ${diff / 60_000} min"
+                diff < 86400_000 -> "Hace ${diff / 3600_000}h"
+                diff < 7 * 86400_000 -> "Hace ${diff / 86400_000} días"
+                else -> {
+                    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    sdf.format(Date(timestamp))
+                }
             }
         }
     }

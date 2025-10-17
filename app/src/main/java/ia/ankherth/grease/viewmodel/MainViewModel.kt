@@ -31,6 +31,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val userName = repository.userName.asLiveData()
     val userAvatarUri = repository.userAvatarUri.asLiveData()
     val storageTreeUri = repository.storageTreeUri.asLiveData()
+    val hapticsEnabled = repository.hapticsEnabled.asLiveData()
 
     // LiveData para indicar que se está realizando una operación
     private val _isLoading = MutableLiveData<Boolean>(false)
@@ -45,14 +46,35 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun setUserName(name: String?) { viewModelScope.launch { repository.setUserName(name) } }
     fun setUserAvatarUri(uri: String?) { viewModelScope.launch { repository.setUserAvatarUri(uri) } }
     fun setStorageTreeUri(uri: String?) { viewModelScope.launch { repository.setStorageTreeUri(uri) } }
+    fun setHapticsEnabled(enabled: Boolean) { viewModelScope.launch { repository.setHapticsEnabled(enabled) } }
+
+    /**
+     * Actualiza el avatar del usuario
+     */
+    fun updateUserAvatar(uri: String) {
+        viewModelScope.launch {
+            try {
+                // Tomar permisos persistentes para el URI
+                val context = getApplication<Application>()
+                val avatarUri = Uri.parse(uri)
+                context.contentResolver.takePersistableUriPermission(
+                    avatarUri,
+                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                repository.setUserAvatarUri(uri)
+            } catch (e: Exception) {
+                _errorEvent.value = ErrorEvent("Error al guardar el avatar: ${e.message}")
+            }
+        }
+    }
 
     /**
      * Agrega o actualiza un PDF en el historial
      */
-    fun addOrUpdatePdf(uri: String, fileName: String, totalPages: Int, currentPage: Int = 0, filePath: String? = null) {
+    fun addOrUpdatePdf(uri: String, fileName: String, totalPages: Int, currentPage: Int = 0, filePath: String? = null, scrollOffset: Float = 0f) {
         viewModelScope.launch {
             try {
-                repository.addOrUpdatePdf(uri, fileName, totalPages, currentPage, filePath)
+                repository.addOrUpdatePdf(uri, fileName, totalPages, currentPage, filePath, scrollOffset)
             } catch (e: Exception) {
                 _errorEvent.value = ErrorEvent(
                     message = "Error al guardar el PDF en el historial: ${e.message}",
@@ -63,11 +85,88 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
+     * Agrega o actualiza un PDF en el historial
+     */
+    fun addPdfToHistory(uri: Uri) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                // Extraer información del URI y agregar al historial
+                val fileName = extractRealFileNameFromUri(uri)
+                repository.addOrUpdatePdf(
+                    uri = uri.toString(),
+                    fileName = fileName,
+                    totalPages = 0, // Se actualizará cuando se abra el PDF
+                    currentPage = 0
+                )
+            } catch (e: Exception) {
+                _errorEvent.value = ErrorEvent("Error al agregar PDF: ${e.message}")
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    /**
+     * Extrae el nombre real del archivo desde el URI usando ContentResolver
+     */
+    private fun extractRealFileNameFromUri(uri: Uri): String {
+        return try {
+            val context = getApplication<Application>()
+            when (uri.scheme) {
+                "content" -> {
+                    context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                        if (cursor.moveToFirst()) {
+                            val displayNameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                            if (displayNameIndex >= 0) {
+                                cursor.getString(displayNameIndex) ?: getDefaultFileName(uri)
+                            } else {
+                                getDefaultFileName(uri)
+                            }
+                        } else {
+                            getDefaultFileName(uri)
+                        }
+                    } ?: getDefaultFileName(uri)
+                }
+                "file" -> {
+                    uri.lastPathSegment ?: "documento.pdf"
+                }
+                else -> getDefaultFileName(uri)
+            }
+        } catch (e: Exception) {
+            getDefaultFileName(uri)
+        }
+    }
+
+    private fun getDefaultFileName(uri: Uri): String {
+        val lastSegment = uri.lastPathSegment ?: "documento"
+        return if (lastSegment.contains(".pdf", ignoreCase = true)) {
+            lastSegment
+        } else {
+            "$lastSegment.pdf"
+        }
+    }
+
+    /**
      * Actualiza el progreso de lectura de un PDF
      */
-    fun updateProgress(uri: String, pageNumber: Int) {
+    fun updateProgress(uri: String, pageNumber: Int, scrollOffset: Float = 0f) {
         viewModelScope.launch {
-            repository.updateProgress(uri, pageNumber)
+            repository.updateProgress(uri, pageNumber, scrollOffset)
+        }
+    }
+
+    /**
+     * Actualiza la URI de un PDF en el historial
+     */
+    fun updatePdfUri(oldUri: String, newUri: String) {
+        viewModelScope.launch {
+            try {
+                // Simular actualización - implementar según el repository actual
+                _errorEvent.value = ErrorEvent("Funcionalidad de reubicación no implementada aún")
+            } catch (e: Exception) {
+                _errorEvent.value = ErrorEvent("Error al actualizar PDF: ${e.message}")
+            }
         }
     }
 
@@ -76,17 +175,80 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun deletePdf(pdf: PdfHistoryEntity) {
         viewModelScope.launch {
-            repository.deletePdf(pdf)
+            try {
+                repository.deletePdf(pdf)
+            } catch (e: Exception) {
+                _errorEvent.value = ErrorEvent("Error al eliminar PDF: ${e.message}")
+            }
         }
     }
 
     /**
-     * Obtiene el PDF más reciente del historial
+     * Limpia todo el historial
+     */
+    fun clearAllHistory() {
+        viewModelScope.launch {
+            try {
+                repository.clearAllHistory()
+            } catch (e: Exception) {
+                _errorEvent.value = ErrorEvent("Error al limpiar historial: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * Obtiene el PDF más reciente
+     */
+    suspend fun getMostRecentPdf(): PdfHistoryEntity? {
+        return repository.getMostRecentPdf()
+    }
+
+    /**
+     * Alterna el estado de favorito de un PDF
+     */
+    fun toggleFavorite(uri: String, isFavorite: Boolean) {
+        viewModelScope.launch {
+            try {
+                repository.updateFavorite(uri, isFavorite)
+            } catch (e: Exception) {
+                _errorEvent.value = ErrorEvent("Error al actualizar favorito: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * Exporta el historial a JSON
+     */
+    suspend fun exportHistory(outputUri: Uri): Result<String> {
+        return repository.exportHistory(outputUri)
+    }
+
+    /**
+     * Importa el historial desde JSON
+     */
+    suspend fun importHistory(inputUri: Uri): Result<Int> {
+        return repository.importHistory(inputUri)
+    }
+
+    /**
+     * Obtiene el PDF más reciente accesible del historial
      */
     fun getMostRecentPdf(callback: (PdfHistoryEntity?) -> Unit) {
-        viewModelScope.launch {
-            val recentPdf = repository.getMostRecentPdf()
-            callback(recentPdf)
+        // Usar el valor actual del LiveData
+        val currentPdfs = allPdfs.value ?: emptyList()
+        val mostRecentAccessible = currentPdfs.firstOrNull { it.isAccessible }
+        callback(mostRecentAccessible)
+    }
+
+    /**
+     * Obtiene la entidad del último PDF abierto o el más reciente como fallback
+     */
+    suspend fun getLastOpenedPdf(): PdfHistoryEntity? {
+        val lastUri = repository.lastOpenedPdfUri.first()
+        return if (!lastUri.isNullOrBlank()) {
+            repository.getPdfByUri(lastUri)
+        } else {
+            repository.getMostRecentPdf()
         }
     }
 
@@ -134,6 +296,47 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     suspend fun getLastOpenedPdfUri(): String? {
         return repository.lastOpenedPdfUri.first()
+    }
+
+    /**
+     * Obtiene el último PDF leído
+     */
+    fun getLastReadPdf(): PdfHistoryEntity? {
+        return allPdfs.value?.maxByOrNull { it.lastReadDate }
+    }
+
+    /**
+     * LiveData para el último PDF leído
+     */
+    val lastReadPdf: LiveData<PdfHistoryEntity?> = MutableLiveData<PdfHistoryEntity?>().apply {
+        allPdfs.observeForever { pdfs ->
+            value = pdfs?.maxByOrNull { it.lastReadDate }
+        }
+    }
+
+    /**
+     * Refresca la lista de PDFs
+     */
+    fun refreshPdfs() {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                // El repository ya maneja la actualización automática a través de Flow
+                // Solo necesitamos simular un refresh si es necesario
+            } catch (e: Exception) {
+                _errorEvent.value = ErrorEvent("Error al actualizar: ${e.message}")
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    /**
+     * Filtra los PDFs (para búsqueda)
+     */
+    fun filterPdfs(query: String) {
+        // La funcionalidad de filtrado se maneja en los fragmentos
+        // Este método puede ser usado para implementar filtrado a nivel de ViewModel si es necesario
     }
 
     /**

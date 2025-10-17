@@ -1,35 +1,24 @@
 <resources>
     <string name="app_name">PDFTOON</string>
-    <string name="prompt_what_to_read">¿Qué deseas leer hoy?</string>
-    <string name="cd_toggle_theme">Cambiar tema claro/oscuro</string>
+    <string name="pdf_progress_percentage">%1$d%%</string>
+    <string name="pdf_page_meta">Página %1$d de %2$d</string>
+    <string name="pdf_last_read">Leído %1$s</string>
+    <string name="page_separator"> / </string>
+    <string name="title_changelog">Registro de cambios</string>
+    <string name="no_changes_title">¡Estás al día!</string>
+    <string name="no_changes_description">No hay nuevas versiones disponibles.</string>
+    <string name="current_version_label">Versión actual: %1$s</string>
+    <string name="cd_add_pdf">Añadir PDF</string>
     <string name="cd_search">Buscar</string>
-    <string name="hint_search_pdfs">Buscar PDFs</string>
-    <string name="cd_clear_search">Borrar búsqueda</string>
-    <string name="cd_play_pause">Reproducir/Pausar</string>
-    <string name="cd_progress">Progreso</string>
-    <string name="title_pdf_history">Historial de PDFs</string>
-    <string name="label_storage_access">Acceso al almacenamiento</string>
-    <string name="empty_no_pdfs">No hay PDFs recientes</string>
-    <string name="empty_tap_to_add">Toca el botón + para abrir un nuevo PDF</string>
+    <string name="hint_search_pdfs">Buscar PDFs…</string>
+    <string name="cd_clear_search">Limpiar búsqueda</string>
+    <string name="title_pdf_history">Historial</string>
     <string name="cd_no_pdfs">No hay PDFs</string>
-    <string name="action_acknowledge">Entendido</string>
-    <string name="cd_add_pdf">Agregar PDF</string>
-    <string name="title_continue_reading">Continuar leyendo</string>
+    <string name="empty_no_pdfs">No tienes PDFs todavía</string>
+    <string name="empty_tap_to_add">Toca el botón + para añadir uno</string>
     <string name="menu_settings">Ajustes</string>
     <string name="menu_changelog">Registro de cambios</string>
     <string name="menu_about">Acerca de</string>
-
-    <!-- Added for lint fixes: layout hardcoded text and content descriptions -->
-    <string name="no_changes_title">No hay cambios registrados</string>
-    <string name="no_changes_description">Los cambios de la aplicación se mostrarán aquí</string>
-    <string name="current_version_label">Versión actual</string>
-    <string name="separator_slash">/</string>
-    <string name="cd_prev_page">Página anterior</string>
-    <string name="cd_fullscreen">Pantalla completa</string>
-    <string name="cd_next_page">Página siguiente</string>
-    <string name="pdf_not_found">Archivo no encontrado</string>
-    <string name="action_relocate">Reubicar</string>
-    <string name="action_delete">Eliminar</string>
     <string name="menu_open_pdf">Abrir PDF</string>
-    <string name="title_changelog">Historial de cambios</string>
+    <string name="pdf_page_meta_unknown">Página %1$d</string>
 </resources>

@@ -3,96 +3,126 @@ package ia.ankherth.grease
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.ScrollView
+import android.widget.TextView
+import android.widget.Button
+import android.view.HapticFeedbackConstants
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
-import androidx.cardview.widget.CardView
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.viewpager2.widget.ViewPager2
+import coil.load
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.snackbar.Snackbar
+import ia.ankherth.grease.adapter.MainPagerAdapter
 import ia.ankherth.grease.adapter.PdfHistoryAdapter
 import ia.ankherth.grease.data.room.PdfHistoryEntity
 import ia.ankherth.grease.util.ThemeUtils
 import ia.ankherth.grease.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
-import java.util.Calendar
-import androidx.core.widget.NestedScrollView
-import androidx.core.view.WindowInsetsControllerCompat
+import java.io.File
 
 /**
- * Actividad principal mejorada con implementaciones para:
- * - Persistencia robusta de historial de PDFs
- * - Acceso a almacenamiento mediante SAF con permisos persistentes
- * - Pull-to-refresh para actualización en tiempo real
- * - Personalización de nombre y foto de inicio
+ * Actividad principal con sistema de navegación por tabs:
+ * - HOME: Muestra los 2 últimos PDFs y funcionalidades principales
+ * - HISTORIAL: Muestra todo el historial de PDFs
+ * - PDF (centro): Abre el último PDF en la última página
  */
 class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
-    private var allPdfs: List<PdfHistoryEntity> = emptyList()
-    private lateinit var pdfAdapter: PdfHistoryAdapter
 
-    // Views
+    // Views principales
     private lateinit var toolbar: Toolbar
-    private lateinit var textGreeting: TextView
-    private lateinit var editTextSearch: EditText
-    private lateinit var buttonClearSearch: ImageButton
-    private lateinit var recyclerViewPdfs: RecyclerView
+    private lateinit var viewPager: ViewPager2
+    private lateinit var bottomNavigation: BottomNavigationView
     private lateinit var fabAddPdf: FloatingActionButton
-    private lateinit var cardContinueReading: CardView
-    private lateinit var textContinueReadingTitle: TextView
-    private lateinit var textContinueReadingProgress: TextView
-    private lateinit var buttonContinueReading: Button
-    private lateinit var buttonDismissError: Button
-    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    private lateinit var layoutEmptyState: View
-    private lateinit var errorContainer: View
+    private lateinit var errorContainer: MaterialCardView
     private lateinit var textErrorMessage: TextView
-    private lateinit var imageUserAvatar: ImageView
+    private lateinit var buttonDismissError: Button
+    private lateinit var rootView: androidx.coordinatorlayout.widget.CoordinatorLayout
 
-    // New UI
-    private lateinit var rootView: View
+    // Vistas de las tarjetas en la pantalla principal
+    private lateinit var mainContentScroll: ScrollView
+    private lateinit var tvWelcomeMessage: TextView
+    private lateinit var cardLastPdf: androidx.cardview.widget.CardView
+    private lateinit var tvPdfTitle: TextView
+    private lateinit var tvPdfMeta: TextView
+    private lateinit var tvLastRead: TextView
+    private lateinit var progressBar: android.widget.ProgressBar
+    private lateinit var tvProgress: TextView
+    private lateinit var emptyStateContainer: View
+    private lateinit var recyclerViewRecentPdfs: androidx.recyclerview.widget.RecyclerView
+    private lateinit var ivPdfPreview: android.widget.ImageView
+    private lateinit var ivUserAvatar: android.widget.ImageView
+    private lateinit var cardAvatar: com.google.android.material.card.MaterialCardView
+
+    // Adapter
+    private lateinit var pagerAdapter: MainPagerAdapter
+    private lateinit var recentPdfsAdapter: PdfHistoryAdapter
 
     // SAF registrars
     private val openPdf = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let { handleNewPdfSelection(it) }
     }
 
+    @Suppress("unused")
     private val relocatePdf = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let { handlePdfRelocation(it, pendingRelocationPdf) }
         pendingRelocationPdf = null
     }
 
-    private val pickAvatar = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        uri?.let {
-            try { contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION) } catch (_: SecurityException) { }
-            viewModel.setUserAvatarUri(it.toString())
+    // Almacenar temporalmente el PDF que está pendiente de reubicación
+    private var pendingRelocationPdf: PdfHistoryEntity? = null
+
+    // Launcher para seleccionar avatar
+    private val pickAvatarLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        uri?.let { handleAvatarSelection(it) }
+    }
+
+    // Launcher para acceso a carpeta (Storage Access Framework)
+    private val openStorageTree = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri: Uri? ->
+        if (uri != null) {
+            try {
+                contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+                viewModel.setStorageTreeUri(uri.toString())
+                showSuccessMessage()
+            } catch (_: SecurityException) {
+                showErrorMessage("No se pudo obtener acceso a la carpeta")
+            }
         }
     }
 
-    // Almacenar temporalmente el PDF que está pendiente de reubicación
-    private var pendingRelocationPdf: PdfHistoryEntity? = null
+    // Preferencias
+    private var hapticsEnabled: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Apply theme before inflating UI (persisted)
         applyPersistedNightMode()
         ThemeUtils.applyTheme(this)
         super.onCreate(savedInstanceState)
+
+        // Enable edge-to-edge display
+        enableEdgeToEdge()
+
         setContentView(R.layout.activity_main)
 
         // Inicializar referencias a las vistas
@@ -100,356 +130,292 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.title = ""
 
-        // Insets: add top padding for status bar
-        ViewCompat.setOnApplyWindowInsetsListener(rootView) { v, insets ->
-            val status = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
-            v.setPadding(v.paddingLeft, status, v.paddingRight, v.paddingBottom)
-            insets
-        }
+        // Configure proper edge-to-edge insets handling
+        setupEdgeToEdgeInsets()
 
         // Update status bar icon color based on current mode
         updateStatusBarIconColor(isDarkMode(this))
 
-        setupUI()
-        setupRecyclerView()
+        setupViewPager()
+        setupBottomNavigation()
         setupClickListeners()
-        setupRefreshLayout()
         observeData()
         setupErrorHandling()
 
         // Manejar intent si la app fue abierta con un PDF
         intent?.data?.let { uri ->
             if (intent.action == Intent.ACTION_VIEW) {
-                // Intent de otra app: intentar abrir y, si se desea, el usuario puede agregarlo a la biblioteca
                 handleNewPdfSelection(uri)
             }
         }
     }
 
-    private fun applyPersistedNightMode() {
-        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        val isDark = prefs.getBoolean("pref_dark", false)
-        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
-            if (isDark) androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
-            else androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
-        )
-    }
-
-    private fun isDarkMode(context: Context): Boolean {
-        // Prefer boolean flag if set, fallback to ThemeUtils string
-        val prefs = context.getSharedPreferences("app_prefs", MODE_PRIVATE)
-        if (prefs.contains("pref_dark")) return prefs.getBoolean("pref_dark", false)
-        return ThemeUtils.readThemePref(context) in listOf("dark", "amoled")
-    }
-
-    private fun updateStatusBarIconColor(isDark: Boolean) {
-        // Use WindowInsetsControllerCompat to avoid deprecated systemUiVisibility flags
-        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = !isDark
-    }
-
     private fun initViews() {
         rootView = findViewById(R.id.rootView)
         toolbar = findViewById(R.id.toolbar)
-        textGreeting = findViewById(R.id.textGreeting)
-        editTextSearch = findViewById(R.id.editTextSearch)
-        buttonClearSearch = findViewById(R.id.buttonClearSearch)
-        recyclerViewPdfs = findViewById(R.id.recyclerViewPdfs)
+        viewPager = findViewById(R.id.viewPager)
+        bottomNavigation = findViewById(R.id.bottomNavigation)
         fabAddPdf = findViewById(R.id.fabAddPdf)
-        buttonContinueReading = findViewById(R.id.buttonContinueReading)
-        cardContinueReading = findViewById(R.id.cardContinueReading)
-        textContinueReadingTitle = findViewById(R.id.textContinueReadingTitle)
-        textContinueReadingProgress = findViewById(R.id.textContinueReadingProgress)
-        buttonDismissError = findViewById(R.id.buttonDismissError)
-        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
-        layoutEmptyState = findViewById(R.id.layoutEmptyState)
         errorContainer = findViewById(R.id.errorContainer)
         textErrorMessage = findViewById(R.id.textErrorMessage)
-        imageUserAvatar = findViewById(R.id.imageUserAvatar)
+        buttonDismissError = findViewById(R.id.buttonDismissError)
+
+        // Inicializar vistas de las tarjetas en la pantalla principal
+        mainContentScroll = findViewById(R.id.mainContentScroll)
+        tvWelcomeMessage = findViewById(R.id.tvWelcomeMessage)
+        cardLastPdf = findViewById(R.id.cardLastPdf)
+        tvPdfTitle = findViewById(R.id.tvPdfTitle)
+        tvPdfMeta = findViewById(R.id.tvPdfMeta)
+        tvLastRead = findViewById(R.id.tvLastRead)
+        progressBar = findViewById(R.id.progressBar)
+        tvProgress = findViewById(R.id.tvProgress)
+        emptyStateContainer = findViewById(R.id.emptyStateContainer)
+        recyclerViewRecentPdfs = findViewById(R.id.recyclerViewRecentPdfs)
+        ivPdfPreview = findViewById(R.id.ivPdfPreview)
+        ivUserAvatar = findViewById(R.id.ivUserAvatar)
+        cardAvatar = findViewById(R.id.cardAvatar)
+
+        // Configurar RecyclerView de PDFs recientes (solo 3)
+        setupRecentPdfsRecyclerView()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        return true
+    @Suppress("DEPRECATION")
+    private fun enableEdgeToEdge() {
+        // Enable edge-to-edge for API 21+ using WindowCompat (modern approach)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // Set transparent system bars (deprecated but necessary for API 29-34 compatibility)
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
+        window.navigationBarColor = android.graphics.Color.TRANSPARENT
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_settings -> { startActivity(Intent(this, SettingsActivity::class.java)); true }
-            R.id.action_changelog -> { startActivity(Intent(this, ChangelogActivity::class.java)); true }
-            R.id.action_about -> { showAboutDialog(); true }
-            else -> super.onOptionsItemSelected(item)
+    private fun setupEdgeToEdgeInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(rootView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            // Apply top inset to the root view to avoid overlap with status bar
+            view.setPadding(
+                view.paddingLeft,
+                insets.top,
+                view.paddingRight,
+                view.paddingBottom
+            )
+
+            windowInsets
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        refreshPdfAccessibility()
-        updateStatusBarIconColor(isDarkMode(this))
+    private fun setupViewPager() {
+        pagerAdapter = MainPagerAdapter(this)
+        viewPager.adapter = pagerAdapter
+        viewPager.isUserInputEnabled = false // Disable swipe to prevent accidental navigation
     }
 
-    private fun setupUI() {
-        // Establecer saludo basado en la hora del día + nombre personalizado
-        viewModel.userName.observe(this) { name ->
-            textGreeting.text = composeGreeting(name)
+    private fun performHaptic() {
+        if (hapticsEnabled) {
+            rootView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
         }
+    }
 
-        // Configurar funcionalidad de búsqueda
-        editTextSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                filterPdfs(s.toString())
-                buttonClearSearch.isVisible = !s.isNullOrEmpty()
+    private fun setupBottomNavigation() {
+        bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    performHaptic()
+                    // Mostrar tarjetas principales, ocultar ViewPager
+                    mainContentScroll.visibility = View.VISIBLE
+                    viewPager.visibility = View.GONE
+                    updateToolbarTitle("HOME")
+                    true
+                }
+                R.id.navigation_pdf_center -> {
+                    performHaptic()
+                    // Acción directa: abrir último PDF o mostrar prompt
+                    openLastPdfOrPrompt()
+                    // Volver a marcar Home para mantener navegación por pestañas
+                    bottomNavigation.selectedItemId = R.id.navigation_home
+                    true
+                }
+                R.id.navigation_history -> {
+                    performHaptic()
+                    // Mostrar historial (ViewPager), ocultar tarjetas principales
+                    mainContentScroll.visibility = View.GONE
+                    viewPager.visibility = View.VISIBLE
+                    viewPager.currentItem = 1
+                    updateToolbarTitle("HISTORIAL")
+                    true
+                }
+                else -> false
             }
-        })
-
-        // Cargar avatar persistido
-        viewModel.userAvatarUri.observe(this) { avatarUri ->
-            if (!avatarUri.isNullOrBlank()) {
-                imageUserAvatar.setImageURI(Uri.parse(avatarUri))
-            } else {
-                imageUserAvatar.setImageResource(R.drawable.ic_person)
-            }
         }
+
+        // Set initial state - mostrar tarjetas principales
+        mainContentScroll.visibility = View.VISIBLE
+        viewPager.visibility = View.GONE
+        bottomNavigation.selectedItemId = R.id.navigation_home
+        updateToolbarTitle("HOME")
     }
 
-    private fun setupRecyclerView() {
-        pdfAdapter = PdfHistoryAdapter(
-            onPdfClick = { pdf -> openPdf(pdf) },
-            onDeleteClick = { pdf ->
-                AlertDialog.Builder(this)
-                    .setTitle("Eliminar del historial")
-                    .setMessage("¿Estás seguro de que deseas eliminar \"${pdf.fileName}\" del historial?")
-                    .setPositiveButton("Eliminar") { _, _ ->
-                        viewModel.deletePdf(pdf)
-                        Toast.makeText(this, "PDF eliminado del historial", Toast.LENGTH_SHORT).show()
-                    }
-                    .setNegativeButton("Cancelar", null)
-                    .show()
-            },
-            onRelocateClick = { pdf -> startPdfRelocation(pdf) }
-        )
-
-        recyclerViewPdfs.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = pdfAdapter
-        }
+    private fun updateToolbarTitle(title: String) {
+        // Fade out, update, then fade in
+        toolbar.animate().cancel()
+        toolbar.alpha = 1f
+        toolbar.animate().alpha(0f).setDuration(80).withEndAction {
+            toolbar.title = title
+            toolbar.animate().alpha(1f).setDuration(120).start()
+        }.start()
     }
 
     private fun setupClickListeners() {
-        buttonClearSearch.setOnClickListener {
-            editTextSearch.text.clear(); buttonClearSearch.visibility = View.GONE
-        }
         fabAddPdf.setOnClickListener { openPdfPicker() }
-        buttonContinueReading.setOnClickListener {
-            viewModel.getMostRecentPdf { recentPdf: PdfHistoryEntity? -> recentPdf?.let { pdf -> openPdf(pdf) } }
+        buttonDismissError.setOnClickListener {
+            hideErrorMessage()
+            viewModel.clearErrorEvent()
         }
-        buttonDismissError.setOnClickListener { hideErrorMessage(); viewModel.clearErrorEvent() }
-        imageUserAvatar.setOnClickListener { pickAvatar.launch(arrayOf("image/*")) }
-        toolbar.setNavigationOnClickListener {
-            findViewById<NestedScrollView>(R.id.nestedScroll)?.smoothScrollTo(0, 0)
+
+        // Click en la tarjeta destacada para abrir el PDF
+        cardLastPdf.setOnClickListener {
+            lifecycleScope.launch {
+                val lastPdf = viewModel.getLastOpenedPdf()
+                if (lastPdf != null) {
+                    openPdfViewer(lastPdf)
+                }
+            }
+        }
+
+        // Click en el avatar para seleccionar imagen
+        cardAvatar.setOnClickListener {
+            pickAvatarLauncher.launch(arrayOf("image/*"))
+        }
+    }
+
+    private fun setupRecentPdfsRecyclerView() {
+        // Configurar adapter para PDFs recientes
+        recentPdfsAdapter = PdfHistoryAdapter(
+            onPdfClick = { pdf ->
+                openPdfViewer(pdf)
+            },
+            onDeleteClick = { pdf ->
+                // Mostrar diálogo de confirmación para eliminar
+                showDeletePdfDialog(pdf)
+            },
+            onRelocateClick = { pdf ->
+                // Reubicar PDF
+                pendingRelocationPdf = pdf
+                relocatePdf.launch(arrayOf("application/pdf"))
+            },
+            onLongPressDelete = { pdf ->
+                // Mostrar diálogo de confirmación para eliminar al mantener presionado
+                performHaptic()
+                showDeletePdfDialog(pdf)
+            }
+        )
+
+        recyclerViewRecentPdfs.apply {
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@MainActivity)
+            adapter = recentPdfsAdapter
+            setHasFixedSize(true)
         }
     }
 
     private fun observeData() {
-        viewModel.allPdfs.observe(this) { pdfs: List<PdfHistoryEntity> ->
-            allPdfs = pdfs
-            updateUI(pdfs)
+        viewModel.allPdfs.observe(this) { pdfs ->
+            if (pdfs.isNotEmpty()) {
+                mainContentScroll.visibility = View.VISIBLE
+                emptyStateContainer.visibility = View.GONE
+
+                // Tarjeta principal: último PDF leído
+                val mostRecent = pdfs.first()
+                tvPdfTitle.text = mostRecent.fileName
+
+                // Evitar división por cero y valores inválidos al calcular porcentaje
+                val totalPages = mostRecent.totalPages.coerceAtLeast(0)
+                val lastReadPage = mostRecent.lastPageRead.coerceAtLeast(0)
+                val progressPercentage = if (totalPages > 0) {
+                    ((lastReadPage.toFloat() / totalPages) * 100).toInt().coerceIn(0, 100)
+                } else {
+                    0
+                }
+
+                progressBar.progress = progressPercentage
+
+                tvProgress.text = if (totalPages > 0) {
+                    getString(R.string.pdf_progress_percentage, progressPercentage)
+                } else {
+                    // Mostrar 0% si no se conoce el total de páginas
+                    getString(R.string.pdf_progress_percentage, 0)
+                }
+
+                tvPdfMeta.text = if (totalPages > 0) {
+                    getString(R.string.pdf_page_meta, lastReadPage + 1, totalPages)
+                } else {
+                    // Si no hay total conocido, sólo mostrar la página actual (1-indexed)
+                    getString(R.string.pdf_page_meta_unknown, lastReadPage + 1)
+                }
+
+                tvLastRead.text = getString(R.string.pdf_last_read, getRelativeTime(mostRecent.lastReadDate))
+
+                mostRecent.thumbnailPath?.let { path ->
+                    ivPdfPreview.load(File(path)) {
+                        crossfade(true)
+                        placeholder(R.drawable.pdf_thumbnail_placeholder)
+                        error(R.drawable.pdf_thumbnail_placeholder)
+                    }
+                } ?: ivPdfPreview.setImageResource(R.drawable.pdf_thumbnail_placeholder)
+
+                cardLastPdf.setOnClickListener { openPdfViewer(mostRecent) }
+
+                // Agregar long-press para eliminar del historial
+                cardLastPdf.setOnLongClickListener {
+                    performHaptic()
+                    showDeletePdfDialog(mostRecent)
+                    true
+                }
+
+                // Lista secundaria: siguientes 3 PDFs
+                recentPdfsAdapter.submitList(pdfs.drop(1).take(3))
+                recyclerViewRecentPdfs.isVisible = pdfs.size > 1
+
+            } else {
+                // Estado vacío
+                mainContentScroll.visibility = View.GONE
+                emptyStateContainer.visibility = View.VISIBLE
+            }
         }
 
-        viewModel.isLoading.observe(this) { isLoading ->
-            swipeRefreshLayout.isRefreshing = isLoading
+        viewModel.userName.observe(this) { name ->
+            tvWelcomeMessage.text = if (!name.isNullOrBlank()) {
+                "Bienvenido, $name"
+            } else {
+                "Bienvenido de vuelta"
+            }
         }
 
-        viewModel.errorEvent.observe(this) { errorEvent ->
-            errorEvent?.let {
+        viewModel.errorEvent.observe(this) { error ->
+            error?.let {
                 showErrorMessage(it.message)
-            } ?: hideErrorMessage()
+                viewModel.clearErrorEvent()
+            }
+        }
+
+        viewModel.userAvatarUri.observe(this) { uri ->
+            // Cargar URI del avatar del usuario
+            if (!uri.isNullOrBlank()) {
+                ivUserAvatar.load(Uri.parse(uri)) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_default_avatar)
+                    error(R.drawable.ic_default_avatar)
+                }
+            } else {
+                ivUserAvatar.setImageResource(R.drawable.ic_default_avatar)
+            }
         }
     }
 
     private fun setupErrorHandling() {
-        errorContainer.visibility = View.GONE
-    }
-
-    private fun setupRefreshLayout() {
-        // Configurar pull-to-refresh
-        swipeRefreshLayout.setOnRefreshListener { refreshPdfAccessibility() }
-        swipeRefreshLayout.setColorSchemeResources(
-            R.color.purple_500,
-            R.color.teal_200,
-            R.color.purple_700
-        )
-    }
-
-    private fun updateUI(pdfs: List<PdfHistoryEntity>) {
-        if (pdfs.isEmpty()) {
-            layoutEmptyState.visibility = View.VISIBLE
-            recyclerViewPdfs.visibility = View.GONE
-            cardContinueReading.visibility = View.GONE
-        } else {
-            layoutEmptyState.visibility = View.GONE
-            recyclerViewPdfs.visibility = View.VISIBLE
-
-            // Mostrar PDF más reciente en sección "Continuar leyendo"
-            val mostRecent = pdfs.firstOrNull()
-            mostRecent?.let { pdf ->
-                cardContinueReading.visibility = View.VISIBLE
-                textContinueReadingTitle.text = pdf.fileName
-                textContinueReadingProgress.text =
-                    "Página ${pdf.lastPageRead + 1} / ${pdf.totalPages} • ${pdf.progressPercentage.toInt()}%"
-            }
-
-            pdfAdapter.submitList(pdfs)
+        buttonDismissError.setOnClickListener {
+            errorContainer.visibility = View.GONE
         }
-    }
-
-    private fun filterPdfs(query: String) {
-        if (query.isBlank()) {
-            pdfAdapter.submitList(allPdfs)
-        } else {
-            val filteredList = allPdfs.filter { pdf ->
-                pdf.fileName.contains(query, ignoreCase = true)
-            }
-            pdfAdapter.submitList(filteredList)
-        }
-    }
-
-    private fun openPdfPicker() {
-        openPdf.launch(arrayOf("application/pdf"))
-    }
-
-    private fun handleNewPdfSelection(uri: Uri) {
-        try {
-            // Intentar persistir permiso de lectura para acceso futuro
-            try {
-                contentResolver.takePersistableUriPermission(
-                    uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-            } catch (_: SecurityException) { /* El proveedor puede no soportar persistencia */ }
-
-            val fileName = getFileNameFromUri(uri) ?: "Documento PDF"
-            val intent = Intent(this, PdfViewerActivity::class.java).apply {
-                putExtra(PdfViewerActivity.EXTRA_PDF_URI, uri)
-                putExtra(PdfViewerActivity.EXTRA_FILE_NAME, fileName)
-            }
-            startActivity(intent)
-        } catch (e: Exception) {
-            showErrorMessage("Error al abrir el PDF: ${e.message}")
-        }
-    }
-
-    private fun openPdf(pdf: PdfHistoryEntity) {
-        try {
-            val uri = Uri.parse(pdf.uri)
-
-            // Verificar si el archivo todavía existe
-            if (checkIfFileExists(uri)) {
-                val intent = Intent(this, PdfViewerActivity::class.java).apply {
-                    putExtra(PdfViewerActivity.EXTRA_PDF_URI, uri)
-                    putExtra(PdfViewerActivity.EXTRA_FILE_NAME, pdf.fileName)
-                    putExtra(PdfViewerActivity.EXTRA_CURRENT_PAGE, pdf.lastPageRead)
-                }
-                startActivity(intent)
-
-                if (!pdf.isAccessible) {
-                    viewModel.updatePdfAccessibility(pdf.uri, true)
-                }
-            } else {
-                showFileNotFoundDialog(pdf)
-            }
-        } catch (e: Exception) {
-            showErrorMessage("Error al abrir el PDF: ${e.message}")
-        }
-    }
-
-    private fun showFileNotFoundDialog(pdf: PdfHistoryEntity) {
-        AlertDialog.Builder(this)
-            .setTitle("Archivo no encontrado")
-            .setMessage("El archivo \"${pdf.fileName}\" ya no existe o no es accesible. ¿Qué deseas hacer?")
-            .setPositiveButton("Reubicar") { _, _ -> startPdfRelocation(pdf) }
-            .setNegativeButton("Eliminar del historial") { _, _ -> viewModel.deletePdf(pdf) }
-            .setNeutralButton("Cancelar", null)
-            .show()
-    }
-
-    private fun startPdfRelocation(pdf: PdfHistoryEntity) {
-        pendingRelocationPdf = pdf
-        relocatePdf.launch(arrayOf("application/pdf"))
-    }
-
-    private fun handlePdfRelocation(newUri: Uri, oldPdf: PdfHistoryEntity?) {
-        if (oldPdf == null) return
-        try {
-            val fileName = getFileNameFromUri(newUri) ?: oldPdf.fileName
-            // Persistir permiso para el nuevo documento
-            try {
-                contentResolver.takePersistableUriPermission(newUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            } catch (_: Exception) {}
-
-            viewModel.addOrUpdatePdf(
-                uri = newUri.toString(),
-                fileName = fileName,
-                totalPages = oldPdf.totalPages,
-                currentPage = oldPdf.lastPageRead
-            )
-            viewModel.deletePdf(oldPdf)
-            Toast.makeText(this, "PDF reubicado correctamente", Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            showErrorMessage("Error al reubicar el PDF: ${e.message}")
-        }
-    }
-
-    private fun refreshPdfAccessibility() {
-        lifecycleScope.launch {
-            swipeRefreshLayout.isRefreshing = true
-            try {
-                allPdfs.forEach { pdf ->
-                    val uri = Uri.parse(pdf.uri)
-                    val isAccessible = checkIfFileExists(uri)
-                    if (pdf.isAccessible != isAccessible) {
-                        viewModel.updatePdfAccessibility(pdf.uri, isAccessible)
-                    }
-                }
-            } catch (e: Exception) {
-                showErrorMessage("Error al actualizar el estado de los PDFs: ${e.message}")
-            } finally {
-                swipeRefreshLayout.isRefreshing = false
-            }
-        }
-    }
-
-    private fun getFileNameFromUri(uri: Uri): String? {
-        return when (uri.scheme) {
-            "content" -> {
-                val cursor = contentResolver.query(uri, null, null, null, null)
-                cursor?.use {
-                    if (it.moveToFirst()) {
-                        val nameIndex = it.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
-                        if (nameIndex >= 0) it.getString(nameIndex) else null
-                    } else null
-                }
-            }
-            "file" -> Uri.parse(uri.toString()).lastPathSegment
-            else -> null
-        }
-    }
-
-    private fun checkIfFileExists(uri: Uri): Boolean {
-        return try {
-            contentResolver.openAssetFileDescriptor(uri, "r")?.use { true } ?: false
-        } catch (_: Exception) { false }
-    }
-
-    private fun composeGreeting(name: String?): String {
-        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        val greeting = when (hour) {
-            in 5..11 -> "Buenos días"
-            in 12..18 -> "Buenas tardes"
-            else -> "Buenas noches"
-        }
-        return if (!name.isNullOrBlank()) "$greeting, $name" else greeting
     }
 
     private fun showErrorMessage(message: String) {
@@ -461,11 +427,127 @@ class MainActivity : AppCompatActivity() {
         errorContainer.visibility = View.GONE
     }
 
-    private fun showAboutDialog() {
+    private fun showSuccessMessage() {
+        Snackbar.make(rootView, "Acceso a carpeta concedido correctamente", Snackbar.LENGTH_SHORT).show()
+    }
+
+    private fun openPdfPicker() {
+        openPdf.launch(arrayOf("application/pdf"))
+    }
+
+    private fun handleNewPdfSelection(uri: Uri) {
+        lifecycleScope.launch {
+            viewModel.addPdfToHistory(uri)
+            // La UI se actualizará a través del observer
+        }
+    }
+
+    private fun handlePdfRelocation(uri: Uri, pdfToRelocate: PdfHistoryEntity?) {
+        if (pdfToRelocate == null) return
+        lifecycleScope.launch {
+            viewModel.updatePdfUri(pdfToRelocate.uri, uri.toString())
+        }
+    }
+
+    private fun handleAvatarSelection(uri: Uri) {
+        lifecycleScope.launch {
+            viewModel.updateUserAvatar(uri.toString())
+        }
+    }
+
+    private fun openPdfViewer(pdf: PdfHistoryEntity) {
+        val intent = Intent(this, PdfViewerActivity::class.java).apply {
+            putExtra(PdfViewerActivity.EXTRA_PDF_URI, pdf.uri.toUri())
+            putExtra(PdfViewerActivity.EXTRA_FILE_NAME, pdf.fileName)
+            putExtra(PdfViewerActivity.EXTRA_CURRENT_PAGE, pdf.lastPageRead)
+            putExtra(PdfViewerActivity.EXTRA_SCROLL_OFFSET, pdf.scrollOffset)
+        }
+        startActivity(intent)
+    }
+
+    private fun openLastPdfOrPrompt() {
+        lifecycleScope.launch {
+            val lastPdf = viewModel.getLastOpenedPdf()
+            if (lastPdf != null) {
+                openPdfViewer(lastPdf)
+            } else {
+                showErrorMessage("No hay PDFs recientes para abrir.")
+            }
+        }
+    }
+
+    private fun showDeletePdfDialog(pdf: PdfHistoryEntity) {
         AlertDialog.Builder(this)
-            .setTitle("PDFTOON")
-            .setMessage("Lector de PDFs rápido y sencillo.\nVersión: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
-            .setPositiveButton("OK", null)
+            .setTitle("Eliminar PDF")
+            .setMessage("¿Estás seguro de que quieres eliminar ${pdf.fileName} del historial?")
+            .setPositiveButton("Eliminar") { _, _ ->
+                lifecycleScope.launch {
+                    viewModel.deletePdf(pdf)
+                }
+            }
+            .setNegativeButton("Cancelar", null)
             .show()
+    }
+
+    private fun getRelativeTime(timestamp: Long): String {
+        val now = System.currentTimeMillis()
+        val diff = now - timestamp
+
+        return when {
+            diff < 60_000 -> "ahora"
+            diff < 3600_000 -> "hace ${diff / 60_000} min"
+            diff < 86400_000 -> "hace ${diff / 3600_000}h"
+            diff < 7 * 86400_000 -> "hace ${diff / 86400_000} días"
+            else -> {
+                val sdf = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+                sdf.format(java.util.Date(timestamp))
+            }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
+                true
+            }
+            R.id.action_changelog -> {
+                startActivity(Intent(this, ChangelogActivity::class.java))
+                true
+            }
+            R.id.action_storage_access -> {
+                openStorageTree.launch(null)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun applyPersistedNightMode() {
+        val theme = getSharedPreferences("settings", MODE_PRIVATE)
+            .getString("theme_preference", "system") ?: "system"
+        AppCompatDelegate.setDefaultNightMode(
+            when (theme) {
+                "light" -> AppCompatDelegate.MODE_NIGHT_NO
+                "dark" -> AppCompatDelegate.MODE_NIGHT_YES
+                else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            }
+        )
+    }
+
+    private fun isDarkMode(context: Context): Boolean {
+        return context.resources.configuration.uiMode and
+                android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
+                android.content.res.Configuration.UI_MODE_NIGHT_YES
+    }
+
+    private fun updateStatusBarIconColor(isDark: Boolean) {
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController.isAppearanceLightStatusBars = !isDark
     }
 }

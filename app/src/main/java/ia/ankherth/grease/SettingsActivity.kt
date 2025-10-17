@@ -47,22 +47,7 @@ class SettingsActivity : AppCompatActivity() {
     class SettingsFragment(private val onPickAvatar: () -> Unit) : PreferenceFragmentCompat() {
         private val viewModel: MainViewModel by lazy { (requireActivity() as SettingsActivity).viewModel }
 
-        private var storagePref: SwitchPreferenceCompat? = null
-
-        // Launcher para seleccionar carpeta y conceder permisos persistentes
-        private val openStorageTree = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri: Uri? ->
-            if (uri != null) {
-                try {
-                    requireContext().contentResolver.takePersistableUriPermission(
-                        uri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                    )
-                    viewModel.setStorageTreeUri(uri.toString())
-                } catch (e: SecurityException) {
-                    // Ignorar: el proveedor puede no permitir persistencia
-                }
-            }
-        }
+        private var hapticsPref: SwitchPreferenceCompat? = null
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.settings_preferences, rootKey)
@@ -88,40 +73,15 @@ class SettingsActivity : AppCompatActivity() {
                 true
             }
 
-            // Toggle de acceso a almacenamiento
-            storagePref = findPreference("pref_storage_access")
-            // Estado inicial
-            storagePref?.isChecked = !viewModel.storageTreeUri.value.isNullOrBlank()
-
-            storagePref?.setOnPreferenceChangeListener { _, newValue ->
-                val enable = newValue as? Boolean ?: false
-                if (enable) {
-                    // Lanzar selector de carpeta; el check se actualizará cuando el usuario elija
-                    openStorageTree.launch(null)
-                    false
-                } else {
-                    // Revocar permiso persistente, si existe
-                    val tree = viewModel.storageTreeUri.value
-                    if (!tree.isNullOrBlank()) {
-                        try {
-                            val uri = Uri.parse(tree)
-                            requireContext().contentResolver.releasePersistableUriPermission(
-                                uri,
-                                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                            )
-                        } catch (_: Exception) { }
-                        viewModel.setStorageTreeUri(null)
-                    }
-                    true
-                }
+            // Haptics preference
+            hapticsPref = findPreference("pref_haptics")
+            // Reflect initial value when available
+            viewModel.hapticsEnabled.observe(this) { enabled ->
+                hapticsPref?.isChecked = enabled == true
             }
-        }
-
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-            // Observar cambios y reflejarlos en el switch
-            viewModel.storageTreeUri.observe(viewLifecycleOwner) { tree ->
-                storagePref?.isChecked = !tree.isNullOrBlank()
+            hapticsPref?.setOnPreferenceChangeListener { _, newValue ->
+                viewModel.setHapticsEnabled((newValue as? Boolean) == true)
+                true
             }
         }
     }

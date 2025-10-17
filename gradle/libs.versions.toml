@@ -19,6 +19,8 @@ permissionx = "1.8.1"
 datastore = "1.1.7"
 pdfviewer = "3.2.0-beta.3"
 ksp = "2.0.21-1.0.28"
+ndk = "27.0.12077973"  # NDK version for 16KB page size support
+coil = "2.6.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,6 +43,7 @@ androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "s
 permissionx = { group = "com.guolindev.permissionx", name = "permissionx", version.ref = "permissionx" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 pdfviewer = { group = "com.github.mhiew", name = "android-pdf-viewer", version.ref = "pdfviewer" }
+coil-kt = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

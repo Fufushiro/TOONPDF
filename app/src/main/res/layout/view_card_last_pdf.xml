@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardPdfHighlight"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp"
+    app:cardUseCompatPadding="true"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:background="@drawable/gradient_card_background">
+
+        <!-- Título del PDF -->
+        <TextView
+            android:id="@+id/tvPdfTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Introducción a Diseño UI.pdf"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/md_theme_light_onPrimaryContainer"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <!-- Metadata (Páginas) -->
+        <TextView
+            android:id="@+id/tvPdfMeta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Página 40 de 50"
+            android:textSize="14sp"
+            android:textColor="@color/md_theme_light_onPrimaryContainer"
+            android:layout_marginTop="6dp"
+            android:fontFamily="sans-serif" />
+
+        <!-- Barra de progreso con porcentaje -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="12dp"
+                android:layout_weight="1"
+                android:progressDrawable="@drawable/progress_drawable_rounded"
+                android:progress="80"
+                android:max="100" />
+
+            <TextView
+                android:id="@+id/tvProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="80%"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/md_theme_light_primary"
+                android:layout_marginStart="12dp"
+                android:fontFamily="sans-serif-medium" />
+
+        </LinearLayout>
+
+        <!-- Última vez leído -->
+        <TextView
+            android:id="@+id/tvLastRead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Leído hace 1 h"
+            android:textSize="13sp"
+            android:textColor="@color/md_theme_light_outline"
+            android:layout_marginTop="12dp"
+            android:fontFamily="sans-serif" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
+

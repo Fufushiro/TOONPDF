@@ -39,6 +39,11 @@
     <color name="md_theme_dark_tertiaryContainer">#004D40</color>
     <color name="md_theme_dark_onTertiaryContainer">#B2DFDB</color>
 
+    <color name="md_theme_dark_background">#121212</color>
+    <color name="md_theme_dark_onBackground">#FFFFFF</color>
+    <color name="md_theme_dark_surface">#1E1E1E</color>
+    <color name="md_theme_dark_onSurface">#E0E0E0</color>
+
     <!-- App custom background tokens -->
     <color name="colorBackgroundLightGradientStart">#C8FACC</color>
     <color name="colorBackgroundLightGradientEnd">#A6ECA8</color>
@@ -67,4 +72,9 @@
     <!-- Common Colors -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Bottom Navigation specific colors -->
+    <color name="bottom_nav_active">#6366F1</color>
+    <color name="bottom_nav_inactive">#B0B0B0</color>
+    <color name="bottom_nav_background">#FFFFFFFF</color>
 </resources>

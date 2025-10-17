@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDFTOON - Nueva Interfaz con Navegación por Tabs</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .status-bar {
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .toolbar {
+            height: 56px;
+            background: white;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .toolbar-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+        .content {
+            height: 600px;
+            overflow-y: auto;
+            background: #fafafa;
+        }
+        .greeting-section {
+            padding: 20px;
+            background: white;
+        }
+        .greeting-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .greeting-text {
+            flex: 1;
+        }
+        .greeting-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        .greeting-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin: 4px 0 0 0;
+        }
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            margin-left: 12px;
+        }
+        .search-bar {
+            background: #f5f5f5;
+            border-radius: 24px;
+            padding: 12px 16px;
+            margin: 16px 20px;
+            display: flex;
+            align-items: center;
+            border: none;
+        }
+        .search-icon {
+            color: #666;
+            margin-right: 8px;
+        }
+        .search-input {
+            border: none;
+            background: none;
+            flex: 1;
+            font-size: 16px;
+            color: #333;
+        }
+        .continue-reading {
+            margin: 20px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 16px;
+            padding: 16px;
+        }
+        .continue-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1976d2;
+            margin: 0 0 8px 0;
+        }
+        .continue-filename {
+            font-size: 14px;
+            color: #1976d2;
+            margin: 0 0 4px 0;
+        }
+        .continue-progress {
+            font-size: 12px;
+            color: #1976d2;
+            margin: 0 0 12px 0;
+        }
+        .continue-button {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            float: right;
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 20px 8px 20px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        .pdf-item {
+            background: white;
+            margin: 4px 16px;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .pdf-icon {
+            width: 32px;
+            height: 32px;
+            background: #1976d2;
+            border-radius: 6px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+        .pdf-info {
+            flex: 1;
+        }
+        .pdf-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        .pdf-progress {
+            font-size: 12px;
+            color: #666;
+            margin: 2px 0 0 0;
+        }
+        .pdf-options {
+            width: 24px;
+            height: 24px;
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 16px;
+        }
+        .bottom-nav {
+            height: 64px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .nav-item.active {
+            color: #1976d2;
+        }
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+        .fab {
+            position: absolute;
+            bottom: 80px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: #1976d2;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 80px 32px;
+            color: #666;
+        }
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Barra de estado -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>●●● 📶 🔋</span>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-title">HOME</div>
+        </div>
+
+        <!-- Contenido de la pestaña HOME -->
+        <div class="content">
+            <!-- Sección de saludo -->
+            <div class="greeting-section">
+                <div class="greeting-header">
+                    <div class="greeting-text">
+                        <h1 class="greeting-title">Buenas tardes, Usuario</h1>
+                        <p class="greeting-subtitle">¿Qué deseas leer hoy?</p>
+                    </div>
+                    <div class="avatar">👤</div>
+                </div>
+            </div>
+
+            <!-- Barra de búsqueda -->
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input class="search-input" placeholder="Buscar PDFs" />
+            </div>
+
+            <!-- Tarjeta continuar leyendo -->
+            <div class="continue-reading">
+                <h3 class="continue-title">Continuar leyendo</h3>
+                <p class="continue-filename">Manual de Android.pdf</p>
+                <p class="continue-progress">Página 45 / 120 • 37%</p>
+                <button class="continue-button">Continuar</button>
+                <div style="clear: both;"></div>
+            </div>
+
+            <!-- Sección de PDFs recientes -->
+            <div class="section-header">
+                <h2 class="section-title">Últimos PDFs</h2>
+            </div>
+
+            <!-- Lista de PDFs (solo 2 en HOME) -->
+            <div class="pdf-item">
+                <div class="pdf-icon">📄</div>
+                <div class="pdf-info">
+                    <p class="pdf-name">Guía de Kotlin.pdf</p>
+                    <p class="pdf-progress">Página 12 / 85 • Hace 2 horas</p>
+                </div>
+                <button class="pdf-options">⋮</button>
+            </div>
+
+            <div class="pdf-item">
+                <div class="pdf-icon">📄</div>
+                <div class="pdf-info">
+                    <p class="pdf-name">Tutorial de Android Studio.pdf</p>
+                    <p class="pdf-progress">Página 8 / 64 • Ayer</p>
+                </div>
+                <button class="pdf-options">⋮</button>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <div class="nav-icon">🏠</div>
+                <div>HOME</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">📚</div>
+                <div>PDFS</div>
+            </div>
+        </div>
+
+        <!-- FAB -->
+        <button class="fab">+</button>
+    </div>
+
+    <br><br>
+
+    <!-- Vista de la pestaña PDFS -->
+    <div class="container">
+        <!-- Barra de estado -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>●●● 📶 🔋</span>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-title">PDFS</div>
+        </div>
+
+        <!-- Contenido de la pestaña PDFS -->
+        <div class="content">
+            <!-- Barra de búsqueda -->
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input class="search-input" placeholder="Buscar PDFs" />
+            </div>
+
+            <!-- Sección de todos los PDFs -->
+            <div class="section-header">
+                <h2 class="section-title">Historial de PDFs</h2>
+                <span style="color: #666; font-size: 14px;">12 PDFs</span>
+            </div>
+
+            <!-- Lista completa de PDFs -->
+            <div class="pdf-item">
+                <div class="pdf-icon">📄</div>
+                <div class="pdf-info">
+                    <p class="pdf-name">Guía de Kotlin.pdf</p>
+                    <p class="pdf-progress">Página 12 / 85 • Hace 2 horas</p>
+                </div>
+                <button class="pdf-options">⋮</button>
+            </div>
+
+            <div class="pdf-item">
+                <div class="pdf-icon">📄</div>
+                <div class="pdf-info">
+                    <p class="pdf-name">Tutorial de Android Studio.pdf</p>
+                    <p class="pdf-progress">Página 8 / 64 • Ayer</p>
+                </div>
+                <button class="pdf-options">⋮</button>
+            </div>
+
+            <div class="pdf-item">
+                <div class="pdf-icon">📄</div>
+                <div class="pdf-info">
+                    <p class="pdf-name">Manual de Android.pdf</p>
+                    <p class="pdf-progress">Página 45 / 120 • Hace 2 días</p>
+                </div>
+                <button class="pdf-options">⋮</button>
+            </div>
+
+            <div class="pdf-item">
+                <div class="pdf-icon">📄</div>
+                <div class="pdf-info">
+                    <p class="pdf-name">Documentación de Material Design.pdf</p>
+                    <p class="pdf-progress">Página 23 / 156 • Hace 3 días</p>
+                </div>
+                <button class="pdf-options">⋮</button>
+            </div>
+
+            <div class="pdf-item">
+                <div class="pdf-icon">📄</div>
+                <div class="pdf-info">
+                    <p class="pdf-name">Guía de Jetpack Compose.pdf</p>
+                    <p class="pdf-progress">Página 67 / 200 • Hace 1 semana</p>
+                </div>
+                <button class="pdf-options">⋮</button>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <div>HOME</div>
+            </div>
+            <div class="nav-item active">
+                <div class="nav-icon">📚</div>
+                <div>PDFS</div>
+            </div>
+        </div>
+
+        <!-- FAB -->
+        <button class="fab">+</button>
+    </div>
+</body>
+</html>

@@ -26,6 +26,7 @@ class UserPreferencesManager(private val context: Context) {
         private val USER_NAME = stringPreferencesKey("user_name")
         private val USER_AVATAR_URI = stringPreferencesKey("user_avatar_uri")
         private val STORAGE_TREE_URI = stringPreferencesKey("storage_tree_uri")
+        private val HAPTICS_ENABLED = booleanPreferencesKey("haptics_enabled")
     }
 
     // Acceso a preferencias como Flows
@@ -51,6 +52,10 @@ class UserPreferencesManager(private val context: Context) {
 
     val storageTreeUri: Flow<String?> = context.dataStore.data.map { preferences ->
         preferences[STORAGE_TREE_URI]
+    }
+
+    val hapticsEnabled: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[HAPTICS_ENABLED] ?: true
     }
 
     // Métodos para actualizar preferencias
@@ -103,6 +108,12 @@ class UserPreferencesManager(private val context: Context) {
             } else {
                 preferences[STORAGE_TREE_URI] = uri
             }
+        }
+    }
+
+    suspend fun setHapticsEnabled(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[HAPTICS_ENABLED] = enabled
         }
     }
 }
