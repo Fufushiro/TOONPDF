@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.9.9] - 2025-10-18
+
+### Changed
+- Actualización de versión a 4.9.9 para sincronizar con `versionName` y artefactos de release.
+- Ajustes menores de publicación (metadatos y empaquetado) sin impacto funcional.
+
+### Fixed
+- Pequeñas correcciones en la configuración de build y firma para garantizar builds consistentes.
+
+Nota: Esta versión no introduce cambios de funcionalidad ni de interfaz de usuario.
+
 ## [4.5.1] - 2025-10-17
 
 ### Added
