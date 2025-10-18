@@ -4,14 +4,27 @@ All notable changes to this project will be documented in this file.
 
 ## [4.9.9] - 2025-10-18
 
+### Added
+- Hoja inferior de opciones para PDFs (bottom sheet):
+  - Nuevos layouts y drawables para fondo y tirador.
+- Diálogo de información del PDF con metadatos clave.
+- Nuevos recursos de iconos adaptativos (anydpi-v26) para launcher.
+
 ### Changed
-- Actualización de versión a 4.9.9 para sincronizar con `versionName` y artefactos de release.
-- Ajustes menores de publicación (metadatos y empaquetado) sin impacto funcional.
+- Interfaz y lógica actualizadas en Activities, ViewModels y Repositorios para soportar las nuevas vistas y flujos.
+- Sustitución de iconos legacy PNG por recursos modernos WebP y XML vectoriales/adaptativos.
+- Ajustes de estilos/temas, arrays y colores para una apariencia más consistente.
+- Mejora de documentación en `README.md`.
+
+### Removed
+- Eliminados recursos PNG legacy de mipmap (hdpi, xhdpi, xxhdpi, xxxhdpi) y definiciones antiguas anydpi.
 
 ### Fixed
-- Pequeñas correcciones en la configuración de build y firma para garantizar builds consistentes.
+- Ajustes en configuración de build (ProGuard/R8, `gradle.properties`) para builds más estables y predecibles.
+- Correcciones menores en preferencias y configuración de firma.
 
-Nota: Esta versión no introduce cambios de funcionalidad ni de interfaz de usuario.
+### Build
+- `versionName` establecido a 4.9.9 y artefactos de release generados (universal y por ABI).
 
 ## [4.5.1] - 2025-10-17
 
