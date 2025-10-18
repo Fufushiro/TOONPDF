@@ -2,6 +2,7 @@ package ia.ankherth.grease.repository
 
 import android.content.Context
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import ia.ankherth.grease.data.room.AppDatabase
 import ia.ankherth.grease.data.room.PdfHistoryDao
@@ -46,12 +47,13 @@ class PdfRepositoryImpl(private val context: Context) {
 
     /**
      * Agrega o actualiza un PDF en el historial
-     * @param uri URI del PDF
-     * @param fileName Nombre del archivo PDF
+     * @param uri URI del archivo PDF
+     * @param fileName Nombre del archivo
      * @param totalPages Número total de páginas
      * @param currentPage Página actual (por defecto 0)
      * @param filePath Ruta opcional del archivo para facilitar la reubicación
      * @param scrollOffset Desplazamiento de scroll para reanudar lectura
+     * @param fileSizeBytes Tamaño del archivo en bytes
      */
     suspend fun addOrUpdatePdf(
         uri: String,
@@ -59,10 +61,11 @@ class PdfRepositoryImpl(private val context: Context) {
         totalPages: Int,
         currentPage: Int = 0,
         filePath: String? = null,
-        scrollOffset: Float = 0f
+        scrollOffset: Float = 0f,
+        fileSizeBytes: Long = 0L
     ) {
         val existingPdf = pdfDao.getPdfByUri(uri)
-        val thumbnailPath = PdfThumbnailGenerator.generateThumbnail(context, Uri.parse(uri))
+        val thumbnailPath = PdfThumbnailGenerator.generateThumbnail(context, uri.toUri())
 
         if (existingPdf != null) {
             // Actualizar PDF existente
@@ -74,7 +77,8 @@ class PdfRepositoryImpl(private val context: Context) {
                 totalPages = totalPages,
                 filePath = filePath ?: existingPdf.filePath,
                 thumbnailPath = thumbnailPath ?: existingPdf.thumbnailPath,
-                isAccessible = true
+                isAccessible = true,
+                fileSizeBytes = if (fileSizeBytes > 0L) fileSizeBytes else existingPdf.fileSizeBytes
             )
             pdfDao.update(updatedPdf)
         } else {
@@ -88,7 +92,8 @@ class PdfRepositoryImpl(private val context: Context) {
                 lastReadDate = System.currentTimeMillis(),
                 filePath = filePath,
                 thumbnailPath = thumbnailPath,
-                isAccessible = true
+                isAccessible = true,
+                fileSizeBytes = fileSizeBytes
             )
             pdfDao.insert(newPdf)
         }

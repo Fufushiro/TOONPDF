@@ -15,7 +15,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
@@ -23,6 +22,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager2.widget.ViewPager2
 import coil.load
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -56,6 +56,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var textErrorMessage: TextView
     private lateinit var buttonDismissError: Button
     private lateinit var rootView: androidx.coordinatorlayout.widget.CoordinatorLayout
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     // Vistas de las tarjetas en la pantalla principal
     private lateinit var mainContentScroll: ScrollView
@@ -70,7 +71,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recyclerViewRecentPdfs: androidx.recyclerview.widget.RecyclerView
     private lateinit var ivPdfPreview: android.widget.ImageView
     private lateinit var ivUserAvatar: android.widget.ImageView
-    private lateinit var cardAvatar: com.google.android.material.card.MaterialCardView
+    private lateinit var cardAvatar: MaterialCardView
 
     // Adapter
     private lateinit var pagerAdapter: MainPagerAdapter
@@ -116,7 +117,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Apply theme before inflating UI (persisted)
-        applyPersistedNightMode()
         ThemeUtils.applyTheme(this)
         super.onCreate(savedInstanceState)
 
@@ -159,6 +159,7 @@ class MainActivity : AppCompatActivity() {
         errorContainer = findViewById(R.id.errorContainer)
         textErrorMessage = findViewById(R.id.textErrorMessage)
         buttonDismissError = findViewById(R.id.buttonDismissError)
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
 
         // Inicializar vistas de las tarjetas en la pantalla principal
         mainContentScroll = findViewById(R.id.mainContentScroll)
@@ -177,6 +178,9 @@ class MainActivity : AppCompatActivity() {
 
         // Configurar RecyclerView de PDFs recientes (solo 3)
         setupRecentPdfsRecyclerView()
+
+        // Configurar SwipeRefreshLayout
+        setupSwipeRefresh()
     }
 
     @Suppress("DEPRECATION")
@@ -236,15 +240,6 @@ class MainActivity : AppCompatActivity() {
                     bottomNavigation.selectedItemId = R.id.navigation_home
                     true
                 }
-                R.id.navigation_history -> {
-                    performHaptic()
-                    // Mostrar historial (ViewPager), ocultar tarjetas principales
-                    mainContentScroll.visibility = View.GONE
-                    viewPager.visibility = View.VISIBLE
-                    viewPager.currentItem = 1
-                    updateToolbarTitle("HISTORIAL")
-                    true
-                }
                 else -> false
             }
         }
@@ -267,24 +262,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
-        fabAddPdf.setOnClickListener { openPdfPicker() }
-        buttonDismissError.setOnClickListener {
-            hideErrorMessage()
-            viewModel.clearErrorEvent()
+        fabAddPdf.setOnClickListener {
+            performHaptic()
+            openPdfPicker()
         }
 
-        // Click en la tarjeta destacada para abrir el PDF
-        cardLastPdf.setOnClickListener {
-            lifecycleScope.launch {
-                val lastPdf = viewModel.getLastOpenedPdf()
-                if (lastPdf != null) {
-                    openPdfViewer(lastPdf)
-                }
-            }
-        }
-
-        // Click en el avatar para seleccionar imagen
+        // Añadir listener al avatar para cambiar foto
         cardAvatar.setOnClickListener {
+            performHaptic()
             pickAvatarLauncher.launch(arrayOf("image/*"))
         }
     }
@@ -316,6 +301,29 @@ class MainActivity : AppCompatActivity() {
             adapter = recentPdfsAdapter
             setHasFixedSize(true)
         }
+    }
+
+    private fun setupSwipeRefresh() {
+        swipeRefreshLayout.setOnRefreshListener {
+            // Recargar los datos cuando el usuario hace pull-to-refresh
+            lifecycleScope.launch {
+                // Simular una pequeña espera para mejor UX
+                kotlinx.coroutines.delay(300)
+                // Forzar recarga de los PDFs del ViewModel
+                viewModel.refreshPdfs()
+                // Detener la animación de refresh
+                swipeRefreshLayout.isRefreshing = false
+                // Mostrar feedback al usuario
+                Snackbar.make(rootView, "Lista actualizada", Snackbar.LENGTH_SHORT).show()
+            }
+        }
+
+        // Personalizar colores del SwipeRefreshLayout
+        swipeRefreshLayout.setColorSchemeResources(
+            R.color.md_theme_light_primary,
+            R.color.md_theme_light_secondary,
+            R.color.md_theme_light_tertiary
+        )
     }
 
     private fun observeData() {
@@ -372,8 +380,8 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
 
-                // Lista secundaria: siguientes 3 PDFs
-                recentPdfsAdapter.submitList(pdfs.drop(1).take(3))
+                // Lista secundaria: siguientes 4 PDFs (para un total de 5 incluyendo el principal)
+                recentPdfsAdapter.submitList(pdfs.drop(1).take(4))
                 recyclerViewRecentPdfs.isVisible = pdfs.size > 1
 
             } else {
@@ -528,22 +536,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun applyPersistedNightMode() {
-        val theme = getSharedPreferences("settings", MODE_PRIVATE)
-            .getString("theme_preference", "system") ?: "system"
-        AppCompatDelegate.setDefaultNightMode(
-            when (theme) {
-                "light" -> AppCompatDelegate.MODE_NIGHT_NO
-                "dark" -> AppCompatDelegate.MODE_NIGHT_YES
-                else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-            }
-        )
-    }
-
+    @Suppress("UNUSED_PARAMETER")
     private fun isDarkMode(context: Context): Boolean {
-        return context.resources.configuration.uiMode and
-                android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
-                android.content.res.Configuration.UI_MODE_NIGHT_YES
+        // Siempre retornar false ya que solo usamos tema claro
+        return false
     }
 
     private fun updateStatusBarIconColor(isDark: Boolean) {

@@ -199,7 +199,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun filterPdfs(query: String) {
-        viewModel.filterPdfs(query)
+        // HomeFragment shows only recent PDFs - filtering handled by observing allPdfs
+        // Search functionality should be in LibraryFragment
     }
 
     private fun openPdf(pdf: PdfHistoryEntity) {

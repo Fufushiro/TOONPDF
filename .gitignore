@@ -13,3 +13,11 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Ignore Android build artifacts
+*.apk
+*.aab
+*.ap_ 
+# Release output directories and metadata
+app/release/
+app/**/output-metadata.json

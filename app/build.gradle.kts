@@ -17,21 +17,26 @@ android {
         applicationId = "ia.ankherth.grease"
         minSdk = 29
         targetSdk = 36
-        versionCode = 8
-        versionName = "4.5.1"
+        versionCode = 9
+        versionName = "4.9.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables { useSupportLibrary = true }
+        vectorDrawables {
+            useSupportLibrary = true
+        }
 
         // Enable resource optimization (modern approach)
         androidResources {
-            localeFilters.addAll(listOf("en", "es"))
+            // Solo español e inglés para reducir tamaño
+            localeFilters += listOf("en", "es")
+            // Elimina recursos no utilizados automáticamente
+            ignoreAssetsPattern = "!.svn:!.git:.*:!CVS:!thumbs.db:!picasa.ini:!*.scc:*~"
         }
 
         // NDK configuration for proper alignment with 16KB page sizes
         ndk {
             // Filter to only include necessary architectures (reduces APK size)
-            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a")
         }
     }
 
@@ -79,11 +84,27 @@ android {
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
             }
+
+            // Optimizaciones adicionales
+            isDebuggable = false
+            isJniDebuggable = false
+            isPseudoLocalesEnabled = false
+            isCrunchPngs = true
         }
         debug {
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-DEBUG"
+        }
+    }
+
+    // Habilitar APK splits por ABI (genera APKs separados por arquitectura)
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("armeabi-v7a", "arm64-v8a")
+            isUniversalApk = true // También genera un APK universal como fallback
         }
     }
 
@@ -97,20 +118,28 @@ android {
                 "META-INF/NOTICE.txt",
                 "META-INF/*.kotlin_module",
                 "kotlin/**",
-                "META-INF/androidx.*.version"
+                "META-INF/androidx.*.version",
+                "META-INF/proguard/androidx-*.pro",
+                "DebugProbesKt.bin",
+                "kotlin-tooling-metadata.json",
+                "okhttp3/**",
+                "META-INF/com.google.*.version"
             )
         }
         jniLibs {
             // CRITICAL: Disable legacy packaging to ensure 16KB alignment
             useLegacyPackaging = false
-            // Keep debug symbols for better crash reports
-            keepDebugSymbols.addAll(listOf("**/*.so"))
         }
     }
 
     buildFeatures {
         viewBinding = true
         buildConfig = true
+        // Desactiva features no utilizadas
+        aidl = false
+        renderScript = false
+        resValues = false
+        shaders = false
     }
 
     compileOptions {
@@ -123,7 +152,10 @@ android {
         jvmTarget = "11"
         freeCompilerArgs += listOf(
             "-opt-in=kotlin.RequiresOptIn",
-            "-Xjvm-default=all"
+            "-Xjvm-default=all",
+            "-Xno-param-assertions",
+            "-Xno-call-assertions",
+            "-Xno-receiver-assertions"
         )
     }
 
@@ -131,6 +163,19 @@ android {
     lint {
         checkReleaseBuilds = false
         abortOnError = false
+        disable += setOf("MissingTranslation", "ExtraTranslation")
+    }
+
+    bundle {
+        language {
+            enableSplit = true
+        }
+        density {
+            enableSplit = true
+        }
+        abi {
+            enableSplit = true
+        }
     }
 }
 
@@ -168,8 +213,11 @@ dependencies {
     // DataStore para preferencias de usuario
     implementation(libs.androidx.datastore.preferences)
 
-    // Coil para carga de imágenes
-    implementation(libs.coil.kt)
+    // Coil para carga de imágenes con optimizaciones
+    implementation(libs.coil.kt) {
+        exclude(group = "androidx.appcompat")
+        exclude(group = "androidx.core")
+    }
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

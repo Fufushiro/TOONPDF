@@ -89,39 +89,43 @@ class PdfViewerActivity : AppCompatActivity(), OnLoadCompleteListener, OnPageCha
         WindowCompat.setDecorFitsSystemWindows(window, false)
         binding.toolbar.title = fileName.substringBeforeLast('.')
 
-        // Escuchar toques en la vista del PDF para reiniciar el temporizador de ocultación
-        binding.pdfView.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS)
-            }
-            false // No consumir el evento
-        }
-
         // Actualizar información de progreso inicial
         updateProgressInfo()
     }
 
     private fun setupPdfViewer() {
         pdfUri?.let { uri ->
+            try {
+                // Tomar permisos persistentes para el URI
+                contentResolver.takePersistableUriPermission(
+                    uri,
+                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: SecurityException) {
+                // Si no se pueden tomar los permisos, intentar cargar de todas formas
+                android.util.Log.w("PdfViewerActivity", "No se pudieron tomar permisos persistentes: ${e.message}")
+            }
+
+            // Configuración minimalista para máxima compatibilidad
+            // Sin espaciado entre páginas para scroll continuo
             binding.pdfView.fromUri(uri)
                 .defaultPage(currentPage)
                 .onLoad(this)
                 .onPageChange(this)
                 .onTap(this)
-                .scrollHandle(DefaultScrollHandle(this)) // Añade un scroll handle
-                .spacing(10) // Espacio entre páginas
-                .enableSwipe(true) // Habilitar swipe para navegar
-                .swipeHorizontal(false) // Scroll vertical
-                .enableDoubletap(true) // Habilitar zoom con doble tap
-                .enableAntialiasing(true) // Mejor calidad de renderizado
-                .pageFling(true) // Animación suave al cambiar página
-                .pageSnap(true) // Ajustar a página completa
-                .autoSpacing(true) // Espaciado automático entre páginas
-                .nightMode(false) // Modo normal
-                .enableAnnotationRendering(true) // Renderizar anotaciones
-                .password(null) // Sin contraseña
                 .scrollHandle(DefaultScrollHandle(this))
+                .spacing(0) // Sin espacios entre páginas
+                .enableSwipe(true)
+                .swipeHorizontal(false)
+                .enableDoubletap(true)
+                .pageFling(true)
+                .pageSnap(false) // Desactivar snap para scroll continuo
+                .autoSpacing(false) // Desactivar espaciado automático
                 .load()
+        } ?: run {
+            // Si no hay URI, mostrar error y cerrar
+            android.widget.Toast.makeText(this, "Error: No se pudo cargar el PDF", android.widget.Toast.LENGTH_LONG).show()
+            finish()
         }
     }
 

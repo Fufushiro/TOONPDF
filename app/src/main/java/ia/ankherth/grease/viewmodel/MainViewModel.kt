@@ -2,6 +2,7 @@ package ia.ankherth.grease.viewmodel
 
 import android.app.Application
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -56,7 +57,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 // Tomar permisos persistentes para el URI
                 val context = getApplication<Application>()
-                val avatarUri = Uri.parse(uri)
+                val avatarUri = uri.toUri()
                 context.contentResolver.takePersistableUriPermission(
                     avatarUri,
                     android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -71,10 +72,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * Agrega o actualiza un PDF en el historial
      */
-    fun addOrUpdatePdf(uri: String, fileName: String, totalPages: Int, currentPage: Int = 0, filePath: String? = null, scrollOffset: Float = 0f) {
+    fun addOrUpdatePdf(uri: String, fileName: String, totalPages: Int, currentPage: Int = 0, filePath: String? = null, scrollOffset: Float = 0f, fileSizeBytes: Long = 0L) {
         viewModelScope.launch {
             try {
-                repository.addOrUpdatePdf(uri, fileName, totalPages, currentPage, filePath, scrollOffset)
+                repository.addOrUpdatePdf(uri, fileName, totalPages, currentPage, filePath, scrollOffset, fileSizeBytes)
             } catch (e: Exception) {
                 _errorEvent.value = ErrorEvent(
                     message = "Error al guardar el PDF en el historial: ${e.message}",
@@ -93,17 +94,81 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _isLoading.value = true
                 // Extraer información del URI y agregar al historial
                 val fileName = extractRealFileNameFromUri(uri)
+                val fileSize = getFileSizeFromUri(uri)
+                val filePath = extractFilePathFromUri(uri)
+
                 repository.addOrUpdatePdf(
                     uri = uri.toString(),
                     fileName = fileName,
                     totalPages = 0, // Se actualizará cuando se abra el PDF
-                    currentPage = 0
+                    currentPage = 0,
+                    filePath = filePath,
+                    scrollOffset = 0f,
+                    fileSizeBytes = fileSize
                 )
             } catch (e: Exception) {
                 _errorEvent.value = ErrorEvent("Error al agregar PDF: ${e.message}")
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    /**
+     * Obtiene el tamaño del archivo desde el URI
+     */
+    private fun getFileSizeFromUri(uri: Uri): Long {
+        return try {
+            val context = getApplication<Application>()
+            context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val sizeIndex = cursor.getColumnIndex(android.provider.OpenableColumns.SIZE)
+                    if (sizeIndex >= 0) {
+                        cursor.getLong(sizeIndex)
+                    } else {
+                        0L
+                    }
+                } else {
+                    0L
+                }
+            } ?: 0L
+        } catch (e: Exception) {
+            0L
+        }
+    }
+
+    /**
+     * Extrae la ruta del archivo desde el URI
+     */
+    private fun extractFilePathFromUri(uri: Uri): String {
+        return try {
+            val context = getApplication<Application>()
+            when (uri.scheme) {
+                "content" -> {
+                    // Intentar obtener la ruta real del archivo
+                    val pathSegments = uri.pathSegments
+                    if (pathSegments.isNotEmpty()) {
+                        // Para URIs de DocumentProvider, el último segmento suele tener información de la ruta
+                        val lastSegment = pathSegments.last()
+                        if (lastSegment.contains(":")) {
+                            val parts = lastSegment.split(":")
+                            if (parts.size > 1) {
+                                "/storage/emulated/0/${parts[1]}"
+                            } else {
+                                uri.toString()
+                            }
+                        } else {
+                            uri.toString()
+                        }
+                    } else {
+                        uri.toString()
+                    }
+                }
+                "file" -> uri.path ?: uri.toString()
+                else -> uri.toString()
+            }
+        } catch (e: Exception) {
+            uri.toString()
         }
     }
 
@@ -159,6 +224,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * Actualiza la URI de un PDF en el historial
      */
+    @Suppress("UNUSED_PARAMETER")
     fun updatePdfUri(oldUri: String, newUri: String) {
         viewModelScope.launch {
             try {
@@ -315,28 +381,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * Refresca la lista de PDFs
+     * Refresca la lista de PDFs (forzar recarga desde la base de datos)
      */
     fun refreshPdfs() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                // El repository ya maneja la actualización automática a través de Flow
-                // Solo necesitamos simular un refresh si es necesario
+                // El LiveData ya está observando cambios en la base de datos
+                // automáticamente a través del Flow, no necesitamos hacer nada especial
             } catch (e: Exception) {
                 _errorEvent.value = ErrorEvent("Error al actualizar: ${e.message}")
             } finally {
                 _isLoading.value = false
             }
         }
-    }
-
-    /**
-     * Filtra los PDFs (para búsqueda)
-     */
-    fun filterPdfs(query: String) {
-        // La funcionalidad de filtrado se maneja en los fragmentos
-        // Este método puede ser usado para implementar filtrado a nivel de ViewModel si es necesario
     }
 
     /**

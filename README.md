@@ -1,8 +1,8 @@
-# PDFTOON v4.5.1
+# PDFTOON v4.9.9
 
 Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblioteca digital", historial persistente y modo de lectura inmersivo.
 
-## 🚀 ¿Qué hay de nuevo en 4.5.1?
+## 🚀 ¿Qué hay de nuevo en 4.9.9?
 
 ### 🏠 Nueva Pantalla de Inicio Rediseñada
 - **Tarjeta destacada de última lectura**: Muestra el último PDF abierto con vista previa, progreso visual y acceso rápido

@@ -13,16 +13,6 @@
             android:summary="Selecciona una imagen de tu galería" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Apariencia">
-        <ListPreference
-            android:key="pref_app_theme"
-            android:title="Tema de la aplicación"
-            android:entries="@array/pref_theme_entries"
-            android:entryValues="@array/pref_theme_values"
-            android:defaultValue="system"
-            app:useSimpleSummaryProvider="true" />
-    </PreferenceCategory>
-
     <PreferenceCategory android:title="Interacción">
         <SwitchPreferenceCompat
             android:key="pref_haptics"

@@ -22,6 +22,8 @@
     <color name="md_theme_light_onSurface">#121212</color>
     <color name="md_theme_light_surfaceVariant">#E3F2E6</color>
     <color name="md_theme_light_outline">#729874</color>
+    <color name="md_theme_light_error">#B00020</color>
+    <color name="md_theme_light_onError">#FFFFFF</color>
 
     <!-- Material You Green Palette (Dark) -->
     <color name="md_theme_dark_primary">#81C784</color>

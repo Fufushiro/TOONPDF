@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.EditTextPreference
-import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
@@ -55,15 +54,6 @@ class SettingsActivity : AppCompatActivity() {
             val namePref = findPreference<EditTextPreference>("pref_user_name")
             namePref?.setOnPreferenceChangeListener { _, newValue ->
                 viewModel.setUserName(newValue?.toString())
-                true
-            }
-
-            val themePref = findPreference<ListPreference>("pref_app_theme")
-            themePref?.setOnPreferenceChangeListener { _, newValue ->
-                val theme = newValue?.toString() ?: "system"
-                viewModel.setAppTheme(theme)
-                ThemeUtils.saveThemePref(requireContext(), theme)
-                requireActivity().recreate()
                 true
             }
 

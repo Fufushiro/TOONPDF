@@ -9,7 +9,9 @@
     <com.github.barteksc.pdfviewer.PDFView
         android:id="@+id/pdfView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true" />
 
     <!-- Top Controls (shown/hidden on tap) -->
     <androidx.appcompat.widget.Toolbar
@@ -18,6 +20,8 @@
         android:layout_height="wrap_content"
         android:background="@drawable/toolbar_gradient_background"
         android:elevation="4dp"
+        android:clickable="true"
+        android:focusable="true"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:title=""
         app:titleTextColor="@android:color/white" />
@@ -30,7 +34,9 @@
         android:layout_gravity="bottom"
         android:background="@drawable/bottom_controls_gradient_background"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:clickable="true"
+        android:focusable="true">
 
         <!-- Progress Information -->
         <LinearLayout
