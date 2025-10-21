@@ -2,6 +2,43 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.0.0] - 2025-10-20
+
+### Added
+- **Soporte completo de internacionalización (i18n):**
+  - Todos los textos de la interfaz ahora soportan español e inglés.
+  - Agregados 14 nuevos strings traducidos en `values/strings.xml` y `values-en/strings.xml`.
+  - La aplicación cambia automáticamente de idioma según la configuración del sistema.
+
+### Changed
+- **Actualización de información del desarrollador:**
+  - El nombre del desarrollador en la sección "Acerca de" ahora muestra "fufushiro" en lugar de "PDFTOON Team".
+  - Actualizado en ambos idiomas (español e inglés).
+- **Mejoras en el toolbar:**
+  - Eliminado el icono de navegación de inicio (casa) del toolbar para una interfaz más limpia.
+  - El toolbar ahora muestra solo el título y el menú de opciones.
+- Reemplazados todos los textos hardcodeados en layouts XML por referencias a recursos de strings.
+- Mejorada la accesibilidad con `contentDescription` consistentes usando recursos de strings.
+- Versión estable con todas las características implementadas.
+
+### Removed
+- **Limpieza de código - eliminados 6 archivos XML innecesarios:**
+  - `fragment_home.xml` (reemplazado por `fragment_new_home.xml`)
+  - `fragment_pdfs.xml` (no usado)
+  - `activity_changelog.xml` (no usado)
+  - `activity_pdf_viewer.xml` (no usado)
+  - `view_card_last_pdf.xml` (no usado)
+  - `item_changelog_entry.xml` (no usado)
+- Reducción del tamaño del código y mejora en mantenibilidad.
+
+### Fixed
+- Corregido uso de `app:tint` en lugar de `android:tint` para compatibilidad con Material Design.
+- Agregado namespace `xmlns:tools` donde era necesario para herramientas de desarrollo.
+
+### Technical
+- Actualización de recursos de strings en `values/strings.xml` y `values-en/strings.xml`.
+- Simplificación del layout del MaterialToolbar en `activity_main.xml`.
+
 ## [4.9.9] - 2025-10-18
 
 ### Added
