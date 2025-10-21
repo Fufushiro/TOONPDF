@@ -1,8 +1,31 @@
-# PDFTOON v4.9.9
+# PDFTOON v5.0.0
 
 Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblioteca digital", historial persistente y modo de lectura inmersivo.
 
-## 🚀 ¿Qué hay de nuevo en 4.9.9?
+## 📱 Capturas de Pantalla
+
+<p align="center">
+  <img src="screenshots/home-screen.png" alt="Pantalla Principal" width="300"/>
+</p>
+
+## � ¿Qué hay de nuevo en 5.0.0?
+
+### 🎨 Visor de PDF con Interfaz Elegante
+- **Toolbar con degradado semitransparente**: Apariencia moderna y sofisticada en la parte superior
+- **Controles inferiores con degradado**: Barra de progreso con fondo degradado elegante
+- **Indicador lateral interactivo**: Arrastra el indicador para navegar rápidamente por el PDF
+- **Animaciones elegantes**: El indicador se agranda al tocarlo con efecto de rebote al soltarlo
+- **Barra de progreso con cambio de color dinámico**: 
+  - Azul (0-79%): Color normal
+  - Naranja (80-89%): Transición suave a naranja cuando te acercas al final
+  - Rojo (90-100%): Degradado rojo intenso para indicar que estás terminando el documento
+
+### 🌍 Internacionalización Completa
+- **Soporte completo de i18n**: Todos los textos de la interfaz ahora soportan español e inglés
+- **Cambio automático de idioma**: La aplicación se adapta automáticamente a la configuración del sistema
+- **Mejora de la accesibilidad y consistencia**
+
+## ✨ Características Principales de 5.0.0
 
 ### 🏠 Nueva Pantalla de Inicio Rediseñada
 - **Tarjeta destacada de última lectura**: Muestra el último PDF abierto con vista previa, progreso visual y acceso rápido
@@ -82,25 +105,6 @@ Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblio
   - Estado de accesibilidad
   - Marcador de favorito
 
-### Exportación/Importación
-```json
-{
-  "version": 1,
-  "exportDate": 1729180800000,
-  "totalEntries": 15,
-  "history": [
-    {
-      "uri": "content://...",
-      "fileName": "Mi Libro.pdf",
-      "totalPages": 250,
-      "lastPageRead": 42,
-      "scrollOffset": 0.35,
-      "lastReadDate": 1729180800000,
-      "isFavorite": true
-    }
-  ]
-}
-```
 
 ## 🛠️ Instalación y uso
 
@@ -168,21 +172,6 @@ keyPassword=TU_PASSWORD_ALIAS
 - **Acceso a archivos**: Storage Access Framework (SAF)
 - **Lenguaje**: Kotlin 100%
 
-### Estructura de la Base de Datos
-```kotlin
-@Entity(tableName = "pdf_history")
-data class PdfHistoryEntity(
-    @PrimaryKey val uri: String,
-    val fileName: String,
-    val totalPages: Int,
-    val lastPageRead: Int,
-    val scrollOffset: Float,      // NUEVO en v2
-    val lastReadDate: Long,
-    val filePath: String?,
-    val isAccessible: Boolean,
-    val isFavorite: Boolean        // NUEVO en v2
-)
-```
 
 ## 🛡️ Privacidad y Seguridad
 - ✅ Sin telemetría ni analytics
@@ -191,47 +180,6 @@ data class PdfHistoryEntity(
 - ✅ Exportación cifrable del historial (JSON local)
 - ✅ Sin permisos de almacenamiento invasivos (usa SAF)
 
-## 🧪 Tests
-```bash
-./gradlew testReleaseUnitTest
-./gradlew lintVitalRelease
-```
-
-## 📝 Documentación para Desarrolladores
-
-### Guardar Progreso de Lectura
-```kotlin
-// Guardar progreso con posición exacta
-viewModel.updateProgress(
-    uri = pdfUri.toString(),
-    pageNumber = currentPage,
-    scrollOffset = 0.35f  // 35% scroll en la página
-)
-```
-
-### Reanudar Lectura
-```kotlin
-// Obtener último PDF y su posición
-val lastPdf = viewModel.getMostRecentPdf()
-lastPdf?.let { pdf ->
-    openPdfViewer(
-        uri = Uri.parse(pdf.uri),
-        fileName = pdf.fileName,
-        page = pdf.lastPageRead,
-        scrollOffset = pdf.scrollOffset
-    )
-}
-```
-
-### Exportar Historial
-```kotlin
-lifecycleScope.launch {
-    val result = viewModel.exportHistory(outputUri)
-    if (result.isSuccess) {
-        Toast.makeText(this, "Historial exportado", Toast.LENGTH_SHORT).show()
-    }
-}
-```
 
 ## 🎯 Roadmap
 - [ ] Anotaciones y marcadores en PDF
@@ -240,6 +188,11 @@ lifecycleScope.launch {
 - [ ] Soporte para otros formatos (EPUB, MOBI)
 - [ ] Gestos personalizables
 - [ ] Temas de color personalizados
+
+## 👨‍💻 Desarrollador
+**fufushiro**
+
+PDFTOON v5.0.2 - Lector de PDF moderno y optimizado para Android
 
 ## 📄 Licencia
 MIT. Ver `LICENSE`.
