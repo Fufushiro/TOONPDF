@@ -162,17 +162,6 @@ keyPassword=TU_PASSWORD_ALIAS
 - Vector drawables en lugar de PNG
 - Tamaño actual: ~31 MB
 
-## 🧩 Arquitectura
-
-### Stack Tecnológico
-- **UI**: Material 3, ViewBinding, ConstraintLayout
-- **Persistencia**: Room Database, DataStore (preferencias)
-- **Arquitectura**: MVVM con LiveData y ViewModel
-- **PDF Rendering**: `com.github.barteksc:android-pdf-viewer`
-- **Acceso a archivos**: Storage Access Framework (SAF)
-- **Lenguaje**: Kotlin 100%
-
-
 ## 🛡️ Privacidad y Seguridad
 - ✅ Sin telemetría ni analytics
 - ✅ Sin conexión a internet requerida
