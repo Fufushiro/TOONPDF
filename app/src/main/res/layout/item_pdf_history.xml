@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cardPdfItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -32,7 +33,7 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:background="@color/md_theme_light_surface"
-                android:contentDescription="Vista previa del PDF" />
+                android:contentDescription="@string/cd_pdf_preview" />
 
         </com.google.android.material.card.MaterialCardView>
 
@@ -49,7 +50,7 @@
                 android:id="@+id/tvPdfTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Documento.pdf"
+                tools:text="@string/sample_pdf_name"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/md_theme_light_onSurface"
@@ -62,7 +63,7 @@
                 android:id="@+id/tvPdfMeta"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Página 10 de 50 • hace 2 h"
+                tools:text="Página 10 de 50 • hace 2 h"
                 android:textSize="13sp"
                 android:textColor="@color/md_theme_light_outline"
                 android:layout_marginTop="4dp"
@@ -90,7 +91,7 @@
                     android:id="@+id/tvProgress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="20%"
+                    tools:text="20%"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:textColor="@color/md_theme_light_primary"

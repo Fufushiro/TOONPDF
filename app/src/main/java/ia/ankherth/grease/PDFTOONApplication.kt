@@ -2,6 +2,9 @@ package ia.ankherth.grease
 
 import android.app.Application
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
+import androidx.preference.PreferenceManager
 import ia.ankherth.grease.util.ChangelogManager
 import java.io.File
 import java.io.PrintWriter
@@ -17,6 +20,12 @@ class PDFTOONApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        // Force light mode globally
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
+        // Apply saved language preference on startup
+        applyLanguagePreference()
 
         // Instalar un manejador global de excepciones para capturar crashes en producción/local
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
@@ -52,6 +61,23 @@ class PDFTOONApplication : Application() {
                 val crashFile = File(filesDir, "last_crash_log.txt")
                 crashFile.appendText("Failed to initialize ChangelogManager: ${e.stackTraceToString()}\n")
             } catch (_: Exception) { /* ignore */ }
+        }
+    }
+
+    private fun applyLanguagePreference() {
+        try {
+            val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+            val selectedLanguage = prefs.getString("pref_language", "system") ?: "system"
+
+            val locales = if (selectedLanguage == "system" || selectedLanguage.isBlank()) {
+                LocaleListCompat.getEmptyLocaleList()
+            } else {
+                LocaleListCompat.forLanguageTags(selectedLanguage)
+            }
+
+            AppCompatDelegate.setApplicationLocales(locales)
+        } catch (e: Exception) {
+            Log.e("PDFTOONApplication", "Failed to apply language preference", e)
         }
     }
 }

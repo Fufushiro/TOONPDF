@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PDFTOON</string>
+    <string name="pdf_progress_percentage">%1$d%%</string>
+    <string name="pdf_page_meta">Page %1$d of %2$d</string>
+    <string name="pdf_last_read">Read %1$s</string>
+    <string name="page_separator"> / </string>
+    <string name="title_changelog">Changelog</string>
+    <string name="no_changes_title">You\'re up to date!</string>
+    <string name="no_changes_description">No new versions available.</string>
+    <string name="current_version_label">Current version</string>
+    <string name="cd_add_pdf">Add PDF</string>
+    <string name="cd_search">Search</string>
+    <string name="hint_search_pdfs">Search PDFs…</string>
+    <string name="cd_clear_search">Clear search</string>
+    <string name="title_pdf_history">History</string>
+    <string name="cd_no_pdfs">No PDFs</string>
+    <string name="empty_no_pdfs">You don\'t have any PDFs yet</string>
+    <string name="empty_tap_to_add">Tap the + button to add one</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_changelog">Changelog</string>
+    <string name="menu_about">About</string>
+    <string name="menu_open_pdf">Open PDF</string>
+    <string name="pdf_page_meta_unknown">Page %1$d</string>
+
+    <!-- Settings -->
+    <string name="settings_category_profile">Profile</string>
+    <string name="settings_user_name_title">Username</string>
+    <string name="settings_user_name_dialog">Enter your name</string>
+    <string name="settings_change_home_photo">Change home photo</string>
+    <string name="settings_change_home_photo_summary">Select an image from your gallery</string>
+
+    <string name="settings_category_interaction">Interaction</string>
+    <string name="settings_haptics_title">Vibration on tap</string>
+    <string name="settings_haptics_summary_on">Actions will produce a slight vibration</string>
+    <string name="settings_haptics_summary_off">Disabled</string>
+
+    <string name="settings_category_other">Other</string>
+    <string name="settings_language_title">App language</string>
+    <string name="settings_storage_access_title">Folder access</string>
+    <string name="settings_storage_access_summary">Manage storage access</string>
+    <string name="settings_about_summary">Information about the app</string>
+
+    <!-- About -->
+    <string name="about_version">Version %1$s</string>
+    <string name="about_description">Optimized PDF reader with modern interface and advanced features.</string>
+    <string name="about_developer_label">Developer</string>
+    <string name="about_developer_name">fufushiro</string>
+    <string name="about_copyright">© 2025 PDFTOON. All rights reserved.</string>
+
+    <!-- Home / empty state -->
+    <string name="home_last_read_title">Last read</string>
+    <string name="home_empty_recent">No recent PDFs</string>
+    <string name="home_empty_open_pdf">Open a PDF to get started</string>
+
+    <!-- Dialog: PDF info labels -->
+    <string name="dialog_pdf_info_title">File information</string>
+    <string name="dialog_pdf_info_name">Name</string>
+    <string name="dialog_pdf_info_size">Size</string>
+    <string name="dialog_pdf_info_location">Location</string>
+    <string name="dialog_pdf_info_total_pages">Total pages</string>
+    <string name="dialog_pdf_info_reading_progress">Reading progress</string>
+    <string name="dialog_pdf_info_last_read">Last read</string>
+    <string name="dialog_close">Close</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_app_icon">App icon</string>
+    <string name="cd_pdf_preview">PDF preview</string>
+    <string name="cd_user_avatar">User avatar</string>
+    <string name="cd_pdf_icon">PDF icon</string>
+
+    <!-- Additional layout texts -->
+    <string name="options_title">Options</string>
+    <string name="pdf_info_action">File information</string>
+    <string name="remove_from_history">Remove from history</string>
+    <string name="good_morning_user">Good morning, User</string>
+    <string name="continue_reading">Continue reading</string>
+    <string name="welcome_back">Welcome back</string>
+    <string name="keep_reading">Keep reading</string>
+    <string name="sample_pdf_name">Document.pdf</string>
+    <string name="sample_pdf_intro">Introduction to UI Design.pdf</string>
+    <string name="no_pdfs_title">No PDFs</string>
+    <string name="no_pdfs_open_first">Open your first PDF to get started</string>
+    <string name="recent_pdfs_title">Recent</string>
+    <string name="ok">OK</string>
+</resources>

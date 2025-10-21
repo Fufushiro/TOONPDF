@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface">
 
     <!-- AppBar con Toolbar -->
     <com.google.android.material.appbar.AppBarLayout
@@ -20,24 +21,17 @@
             android:layout_height="48dp"
             android:minHeight="48dp"
             android:background="@android:color/transparent"
-            app:navigationIcon="@drawable/ic_home"
             app:titleTextColor="?attr/colorOnBackground"
             tools:title="PDFTOON" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Contenido principal con ViewPager2 Y las tarjetas directamente -->
+    <!-- Contenido principal -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- ViewPager2 for fragments (mantener para historial) -->
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewPager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
 
         <!-- SwipeRefreshLayout para pull-to-refresh -->
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -50,8 +44,7 @@
                 android:id="@+id/mainContentScroll"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fillViewport="true"
-                android:background="@color/md_theme_light_background">
+                android:fillViewport="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -85,7 +78,7 @@
                                 android:layout_height="match_parent"
                                 android:scaleType="centerCrop"
                                 android:src="@drawable/ic_default_avatar"
-                                android:contentDescription="Avatar del usuario" />
+                                android:contentDescription="@string/cd_user_avatar" />
 
                         </com.google.android.material.card.MaterialCardView>
 
@@ -101,10 +94,10 @@
                                 android:id="@+id/tvWelcomeMessage"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Bienvenido de vuelta"
+                                android:text="@string/welcome_back"
                                 android:textSize="24sp"
                                 android:textStyle="bold"
-                                android:textColor="@color/md_theme_light_onBackground"
+                                android:textColor="?attr/colorOnBackground"
                                 android:fontFamily="sans-serif-medium"
                                 android:maxLines="2"
                                 android:ellipsize="end" />
@@ -112,9 +105,9 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Continúa leyendo"
+                                android:text="@string/keep_reading"
                                 android:textSize="13sp"
-                                android:textColor="@color/md_theme_light_outline"
+                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:layout_marginTop="2dp"
                                 android:fontFamily="sans-serif" />
 
@@ -126,15 +119,15 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Última lectura"
+                        android:text="@string/home_last_read_title"
                         android:textSize="22sp"
                         android:textStyle="bold"
-                        android:textColor="@color/md_theme_light_onBackground"
+                        android:textColor="?attr/colorOnBackground"
                         android:layout_marginBottom="12dp"
                         android:fontFamily="sans-serif-medium" />
 
                     <!-- Tarjeta destacada de última lectura -->
-                    <androidx.cardview.widget.CardView
+                    <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardLastPdf"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -159,17 +152,18 @@
                                 android:layout_weight="1"
                                 android:orientation="vertical"
                                 android:layout_gravity="center_vertical"
-                                android:paddingEnd="12dp">
+                                android:paddingEnd="12dp"
+                                android:paddingStart="0dp">
 
                                 <!-- Título del PDF -->
                                 <TextView
                                     android:id="@+id/tvPdfTitle"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="Introducción a Diseño UI.pdf"
+                                    android:text="@string/sample_pdf_intro"
                                     android:textSize="18sp"
                                     android:textStyle="bold"
-                                    android:textColor="@color/md_theme_light_onPrimaryContainer"
+                                    android:textColor="?attr/colorOnPrimaryContainer"
                                     android:fontFamily="sans-serif-medium"
                                     android:maxLines="2"
                                     android:ellipsize="end" />
@@ -179,9 +173,9 @@
                                     android:id="@+id/tvPdfMeta"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Página 40 de 50"
+                                    tools:text="@string/pdf_page_meta"
                                     android:textSize="13sp"
-                                    android:textColor="@color/md_theme_light_onPrimaryContainer"
+                                    android:textColor="?attr/colorOnPrimaryContainer"
                                     android:layout_marginTop="6dp"
                                     android:fontFamily="sans-serif" />
 
@@ -207,10 +201,10 @@
                                         android:id="@+id/tvProgress"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="80%"
+                                        tools:text="80%"
                                         android:textSize="13sp"
                                         android:textStyle="bold"
-                                        android:textColor="@color/md_theme_light_primary"
+                                        android:textColor="?attr/colorPrimary"
                                         android:layout_marginStart="10dp"
                                         android:fontFamily="sans-serif-medium" />
 
@@ -221,9 +215,9 @@
                                     android:id="@+id/tvLastRead"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Leído hace 1 h"
+                                    tools:text="@string/pdf_last_read"
                                     android:textSize="12sp"
-                                    android:textColor="@color/md_theme_light_outline"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
                                     android:layout_marginTop="10dp"
                                     android:fontFamily="sans-serif" />
 
@@ -241,14 +235,14 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
                                     android:scaleType="centerCrop"
-                                    android:background="@color/md_theme_light_surface"
-                                    android:contentDescription="Vista previa del PDF" />
+                                    android:background="?attr/colorSurface"
+                                    android:contentDescription="@string/cd_pdf_preview" />
 
                             </com.google.android.material.card.MaterialCardView>
 
                         </LinearLayout>
 
-                    </androidx.cardview.widget.CardView>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <!-- Estado vacío -->
                     <LinearLayout
@@ -265,24 +259,24 @@
                             android:layout_height="80dp"
                             android:src="@drawable/ic_empty_pdf"
                             android:alpha="0.3"
-                            android:contentDescription="Icono PDF" />
+                            android:contentDescription="@string/cd_pdf_icon" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Sin PDFs"
+                            android:text="@string/no_pdfs_title"
                             android:textSize="24sp"
                             android:textStyle="bold"
-                            android:textColor="@color/md_theme_light_outline"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:fontFamily="sans-serif-medium"
                             android:layout_marginTop="16dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Abre tu primer PDF para comenzar"
+                            android:text="@string/no_pdfs_open_first"
                             android:textSize="14sp"
-                            android:textColor="@color/md_theme_light_outline"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:layout_marginTop="8dp"
                             android:gravity="center" />
                     </LinearLayout>
@@ -291,10 +285,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Recientes"
+                        android:text="@string/recent_pdfs_title"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:textColor="@color/md_theme_light_onBackground"
+                        android:textColor="?attr/colorOnBackground"
                         android:layout_marginTop="24dp"
                         android:layout_marginBottom="12dp"
                         android:fontFamily="sans-serif-medium" />
@@ -360,7 +354,7 @@
                 android:paddingEnd="8dp"
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp"
-                android:text="OK"
+                android:text="@string/ok"
                 android:textSize="11sp"
                 android:textColor="#B71C1C" />
         </LinearLayout>

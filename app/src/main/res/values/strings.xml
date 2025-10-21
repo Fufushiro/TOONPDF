@@ -7,7 +7,7 @@
     <string name="title_changelog">Registro de cambios</string>
     <string name="no_changes_title">¡Estás al día!</string>
     <string name="no_changes_description">No hay nuevas versiones disponibles.</string>
-    <string name="current_version_label">Versión actual: %1$s</string>
+    <string name="current_version_label">Versión actual</string>
     <string name="cd_add_pdf">Añadir PDF</string>
     <string name="cd_search">Buscar</string>
     <string name="hint_search_pdfs">Buscar PDFs…</string>
@@ -21,4 +21,72 @@
     <string name="menu_about">Acerca de</string>
     <string name="menu_open_pdf">Abrir PDF</string>
     <string name="pdf_page_meta_unknown">Página %1$d</string>
+
+    <!-- Ajustes -->
+    <string name="settings_category_profile">Perfil</string>
+    <string name="settings_user_name_title">Nombre de usuario</string>
+    <string name="settings_user_name_dialog">Escribe tu nombre</string>
+    <string name="settings_change_home_photo">Cambiar foto de inicio</string>
+    <string name="settings_change_home_photo_summary">Selecciona una imagen de tu galería</string>
+
+    <string name="settings_category_interaction">Interacción</string>
+    <string name="settings_haptics_title">Vibración al pulsar</string>
+    <string name="settings_haptics_summary_on">Las acciones producirán una ligera vibración</string>
+    <string name="settings_haptics_summary_off">Desactivado</string>
+
+    <string name="settings_category_other">Otros</string>
+    <string name="settings_language_title">Idioma de la aplicación</string>
+    <string name="settings_storage_access_title">Acceso a carpeta</string>
+    <string name="settings_storage_access_summary">Gestionar el acceso al almacenamiento</string>
+    <string name="settings_about_summary">Información sobre la aplicación</string>
+
+    <!-- Acerca de -->
+    <string name="about_version">Versión %1$s</string>
+    <string name="about_description">Lector de PDFs optimizado con interfaz moderna y funcionalidades avanzadas.</string>
+    <string name="about_developer_label">Desarrollador</string>
+    <string name="about_developer_name">fufushiro</string>
+    <string name="about_copyright">© 2025 PDFTOON. Todos los derechos reservados.</string>
+
+    <!-- Inicio / estado vacío -->
+    <string name="home_last_read_title">Última lectura</string>
+    <string name="home_empty_recent">No hay PDFs recientes</string>
+    <string name="home_empty_open_pdf">Abre un PDF para comenzar</string>
+
+    <!-- Diálogo: etiquetas de información del PDF -->
+    <string name="dialog_pdf_info_title">Información del archivo</string>
+    <string name="dialog_pdf_info_name">Nombre</string>
+    <string name="dialog_pdf_info_size">Tamaño</string>
+    <string name="dialog_pdf_info_location">Ubicación</string>
+    <string name="dialog_pdf_info_total_pages">Total de páginas</string>
+    <string name="dialog_pdf_info_reading_progress">Progreso de lectura</string>
+    <string name="dialog_pdf_info_last_read">Última lectura</string>
+    <string name="dialog_close">Cerrar</string>
+
+    <!-- Descripciones de contenido -->
+    <string name="cd_app_icon">Icono de la aplicación</string>
+    <string name="cd_pdf_preview">Vista previa del PDF</string>
+    <string name="cd_user_avatar">Avatar del usuario</string>
+    <string name="cd_pdf_icon">Icono PDF</string>
+
+    <!-- Textos adicionales para layouts -->
+    <string name="options_title">Opciones</string>
+    <string name="pdf_info_action">Información del archivo</string>
+    <string name="remove_from_history">Eliminar del historial</string>
+    <string name="good_morning_user">Buenos días, Usuario</string>
+    <string name="continue_reading">Continuar leyendo</string>
+    <string name="welcome_back">Bienvenido de vuelta</string>
+    <string name="keep_reading">Continúa leyendo</string>
+    <string name="sample_pdf_name">Documento.pdf</string>
+    <string name="sample_pdf_intro">Introducción a Diseño UI.pdf</string>
+    <string name="no_pdfs_title">Sin PDFs</string>
+    <string name="no_pdfs_open_first">Abre tu primer PDF para comenzar</string>
+    <string name="recent_pdfs_title">Recientes</string>
+    <string name="ok">OK</string>
+
+    <!-- Strings faltantes -->
+    <string name="search_hint">Buscar…</string>
+    <string name="changelog_empty">No hay cambios registrados</string>
+    <string name="cd_change_type">Tipo de cambio</string>
+    <string name="pdfs_empty">No hay PDFs</string>
+    <string name="pdfs_empty_hint">Toca el botón + para abrir un PDF</string>
 </resources>

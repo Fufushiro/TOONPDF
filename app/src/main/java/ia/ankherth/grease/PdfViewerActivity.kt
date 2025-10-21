@@ -19,8 +19,8 @@ import androidx.lifecycle.lifecycleScope
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
 import com.github.barteksc.pdfviewer.listener.OnTapListener
-import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import ia.ankherth.grease.databinding.ActivityPdfViewerBinding
+import ia.ankherth.grease.util.CustomScrollHandle
 import ia.ankherth.grease.util.ThemeUtils
 import ia.ankherth.grease.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
@@ -50,6 +50,10 @@ class PdfViewerActivity : AppCompatActivity(), OnLoadCompleteListener, OnPageCha
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Force light mode
+        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+            androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+        )
         ThemeUtils.applyTheme(this, fullscreen = true)
         super.onCreate(savedInstanceState)
         binding = ActivityPdfViewerBinding.inflate(layoutInflater)
@@ -113,7 +117,7 @@ class PdfViewerActivity : AppCompatActivity(), OnLoadCompleteListener, OnPageCha
                 .onLoad(this)
                 .onPageChange(this)
                 .onTap(this)
-                .scrollHandle(DefaultScrollHandle(this))
+                .scrollHandle(CustomScrollHandle(this)) // Usar CustomScrollHandle
                 .spacing(0) // Sin espacios entre páginas
                 .enableSwipe(true)
                 .swipeHorizontal(false)
@@ -236,11 +240,63 @@ class PdfViewerActivity : AppCompatActivity(), OnLoadCompleteListener, OnPageCha
             val progress = ((displayPage.toFloat() / totalPages.toFloat()) * 100).toInt()
             binding.textProgress.text = "$progress%"
             binding.progressBar.progress = progress
+
+            // Animación elegante del color de la barra según el progreso
+            animateProgressBarColor(progress)
         } else {
             binding.textCurrentPage.text = "0"
             binding.textTotalPages.text = "0"
             binding.textProgress.text = "0%"
             binding.progressBar.progress = 0
+        }
+    }
+
+    private fun animateProgressBarColor(progress: Int) {
+        val newDrawable = when {
+            progress >= 90 -> R.drawable.progress_drawable_gradient_red
+            progress >= 80 -> R.drawable.progress_drawable_gradient_orange
+            else -> R.drawable.progress_drawable_rounded
+        }
+
+        // Solo cambiar si es diferente al actual
+        if (binding.progressBar.tag != newDrawable) {
+            val oldDrawable = binding.progressBar.progressDrawable
+            val newProgressDrawable = androidx.core.content.ContextCompat.getDrawable(this, newDrawable)
+
+            if (oldDrawable != null && newProgressDrawable != null) {
+                // Crear transición suave entre drawables
+                val transition = android.graphics.drawable.TransitionDrawable(
+                    arrayOf(oldDrawable, newProgressDrawable)
+                )
+                binding.progressBar.progressDrawable = transition
+                transition.startTransition(500) // 500ms de transición elegante
+
+                // Actualizar el tag para rastrear el drawable actual
+                binding.progressBar.tag = newDrawable
+            } else {
+                binding.progressBar.setProgressDrawable(newProgressDrawable)
+                binding.progressBar.tag = newDrawable
+            }
+
+            // Animar también el texto del porcentaje con color
+            val textColor = when {
+                progress >= 90 -> android.graphics.Color.parseColor("#CC0000") // Rojo intenso
+                progress >= 80 -> android.graphics.Color.parseColor("#FF6B35") // Naranja/rojo
+                else -> androidx.core.content.ContextCompat.getColor(this, R.color.md_theme_light_primary)
+            }
+
+            // Animar el cambio de color del texto
+            val currentColor = binding.textProgress.currentTextColor
+            val colorAnimator = android.animation.ValueAnimator.ofObject(
+                android.animation.ArgbEvaluator(),
+                currentColor,
+                textColor
+            )
+            colorAnimator.duration = 500
+            colorAnimator.addUpdateListener { animator ->
+                binding.textProgress.setTextColor(animator.animatedValue as Int)
+            }
+            colorAnimator.start()
         }
     }
 }

@@ -19,7 +19,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Opciones"
+        android:text="@string/options_title"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@color/md_theme_light_onSurface"
@@ -42,14 +42,14 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_info"
-            android:tint="@color/md_theme_light_primary"
-            android:contentDescription="Info" />
+            app:tint="@color/md_theme_light_primary"
+            android:contentDescription="@string/pdf_info_action" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Información del archivo"
+            android:text="@string/pdf_info_action"
             android:textSize="16sp"
             android:textColor="@color/md_theme_light_onSurface"
             android:layout_marginStart="16dp"
@@ -73,14 +73,14 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_delete"
-            android:tint="@color/md_theme_light_error"
-            android:contentDescription="Eliminar" />
+            app:tint="@color/md_theme_light_error"
+            android:contentDescription="@string/remove_from_history" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Eliminar del historial"
+            android:text="@string/remove_from_history"
             android:textSize="16sp"
             android:textColor="@color/md_theme_light_error"
             android:layout_marginStart="16dp"

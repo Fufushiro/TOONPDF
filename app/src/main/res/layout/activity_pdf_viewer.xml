@@ -5,40 +5,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- PDF Viewer -->
+    <!-- PDF View -->
     <com.github.barteksc.pdfviewer.PDFView
         android:id="@+id/pdfView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clickable="true"
-        android:focusable="true" />
+        android:layout_height="match_parent" />
 
-    <!-- Top Controls (shown/hidden on tap) -->
-    <androidx.appcompat.widget.Toolbar
+    <!-- Toolbar superior -->
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:background="@drawable/toolbar_gradient_background"
-        android:elevation="4dp"
-        android:clickable="true"
-        android:focusable="true"
+        android:elevation="0dp"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:title=""
-        app:titleTextColor="@android:color/white" />
+        app:titleTextColor="@color/md_theme_light_onSurface"
+        tools:title="Document.pdf" />
 
-    <!-- Bottom Progress Bar and Controls -->
+    <!-- Controles inferiores -->
     <LinearLayout
         android:id="@+id/bottomControls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@drawable/bottom_controls_gradient_background"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:clickable="true"
-        android:focusable="true">
+        android:background="@drawable/bottom_controls_gradient_background"
+        android:elevation="0dp"
+        android:padding="16dp">
 
-        <!-- Progress Information -->
+        <!-- Información de página -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -49,48 +44,54 @@
                 android:id="@+id/textCurrentPage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
-                android:textSize="14sp"
-                tools:text="25" />
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/md_theme_light_onSurface"
+                tools:text="1" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/page_separator"
-                android:textColor="@android:color/white"
-                android:textSize="14sp" />
+                android:text=" / "
+                android:textSize="16sp"
+                android:textColor="@color/md_theme_light_onSurfaceVariant" />
 
             <TextView
                 android:id="@+id/textTotalPages"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@android:color/white"
-                android:textSize="14sp"
+                android:textSize="16sp"
+                android:textColor="@color/md_theme_light_onSurfaceVariant"
                 tools:text="100" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/textProgress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
                 android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/md_theme_light_primary"
                 tools:text="25%" />
 
         </LinearLayout>
 
-        <!-- Progress Bar -->
-        <com.google.android.material.progressindicator.LinearProgressIndicator
+        <!-- Barra de progreso -->
+        <ProgressBar
             android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="8dp"
             android:layout_marginTop="8dp"
-            app:indicatorColor="?attr/colorPrimary"
-            app:trackColor="#40FFFFFF"
-            app:trackCornerRadius="4dp"
-            app:trackThickness="4dp"
-            tools:progress="25" />
+            android:progressDrawable="@drawable/progress_drawable_rounded"
+            tools:progress="25"
+            android:max="100" />
 
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

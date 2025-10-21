@@ -23,13 +23,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.viewpager2.widget.ViewPager2
 import coil.load
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.snackbar.Snackbar
-import ia.ankherth.grease.adapter.MainPagerAdapter
 import ia.ankherth.grease.adapter.PdfHistoryAdapter
 import ia.ankherth.grease.data.room.PdfHistoryEntity
 import ia.ankherth.grease.util.ThemeUtils
@@ -49,7 +47,6 @@ class MainActivity : AppCompatActivity() {
 
     // Views principales
     private lateinit var toolbar: Toolbar
-    private lateinit var viewPager: ViewPager2
     private lateinit var bottomNavigation: BottomNavigationView
     private lateinit var fabAddPdf: FloatingActionButton
     private lateinit var errorContainer: MaterialCardView
@@ -61,7 +58,7 @@ class MainActivity : AppCompatActivity() {
     // Vistas de las tarjetas en la pantalla principal
     private lateinit var mainContentScroll: ScrollView
     private lateinit var tvWelcomeMessage: TextView
-    private lateinit var cardLastPdf: androidx.cardview.widget.CardView
+    private lateinit var cardLastPdf: MaterialCardView
     private lateinit var tvPdfTitle: TextView
     private lateinit var tvPdfMeta: TextView
     private lateinit var tvLastRead: TextView
@@ -74,7 +71,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cardAvatar: MaterialCardView
 
     // Adapter
-    private lateinit var pagerAdapter: MainPagerAdapter
     private lateinit var recentPdfsAdapter: PdfHistoryAdapter
 
     // SAF registrars
@@ -136,7 +132,6 @@ class MainActivity : AppCompatActivity() {
         // Update status bar icon color based on current mode
         updateStatusBarIconColor(isDarkMode(this))
 
-        setupViewPager()
         setupBottomNavigation()
         setupClickListeners()
         observeData()
@@ -153,10 +148,8 @@ class MainActivity : AppCompatActivity() {
     private fun initViews() {
         rootView = findViewById(R.id.rootView)
         toolbar = findViewById(R.id.toolbar)
-        viewPager = findViewById(R.id.viewPager)
         bottomNavigation = findViewById(R.id.bottomNavigation)
         fabAddPdf = findViewById(R.id.fabAddPdf)
-        errorContainer = findViewById(R.id.errorContainer)
         textErrorMessage = findViewById(R.id.textErrorMessage)
         buttonDismissError = findViewById(R.id.buttonDismissError)
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
@@ -209,12 +202,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupViewPager() {
-        pagerAdapter = MainPagerAdapter(this)
-        viewPager.adapter = pagerAdapter
-        viewPager.isUserInputEnabled = false // Disable swipe to prevent accidental navigation
-    }
-
     private fun performHaptic() {
         if (hapticsEnabled) {
             rootView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
@@ -226,9 +213,8 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.navigation_home -> {
                     performHaptic()
-                    // Mostrar tarjetas principales, ocultar ViewPager
+                    // Mostrar tarjetas principales
                     mainContentScroll.visibility = View.VISIBLE
-                    viewPager.visibility = View.GONE
                     updateToolbarTitle("HOME")
                     true
                 }
@@ -246,7 +232,6 @@ class MainActivity : AppCompatActivity() {
 
         // Set initial state - mostrar tarjetas principales
         mainContentScroll.visibility = View.VISIBLE
-        viewPager.visibility = View.GONE
         bottomNavigation.selectedItemId = R.id.navigation_home
         updateToolbarTitle("HOME")
     }
@@ -298,8 +283,16 @@ class MainActivity : AppCompatActivity() {
 
         recyclerViewRecentPdfs.apply {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@MainActivity)
+            // Asegurar que el LayoutManager permita auto-measure para que
+            // el RecyclerView con wrap_content dentro de un ScrollView mida su altura.
+            (layoutManager as? androidx.recyclerview.widget.LinearLayoutManager)?.isAutoMeasureEnabled = true
             adapter = recentPdfsAdapter
-            setHasFixedSize(true)
+            // No usar setHasFixedSize(true) cuando el RecyclerView está dentro de un ScrollView
+            // porque impide que el RecyclerView mida su altura correctamente; usar false para
+            // permitir auto-measure y que expanda su contenido.
+            setHasFixedSize(false)
+            // Desactivar nested scrolling porque el RecyclerView está dentro de un ScrollView
+            isNestedScrollingEnabled = false
         }
     }
 
@@ -526,10 +519,6 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.action_changelog -> {
                 startActivity(Intent(this, ChangelogActivity::class.java))
-                true
-            }
-            R.id.action_storage_access -> {
-                openStorageTree.launch(null)
                 true
             }
             else -> super.onOptionsItemSelected(item)

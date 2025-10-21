@@ -17,8 +17,8 @@ android {
         applicationId = "ia.ankherth.grease"
         minSdk = 29
         targetSdk = 36
-        versionCode = 9
-        versionName = "4.9.9"
+        versionCode = 10
+        versionName = "5.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

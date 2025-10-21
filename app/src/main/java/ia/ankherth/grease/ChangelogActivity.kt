@@ -20,6 +20,10 @@ class ChangelogActivity : AppCompatActivity() {
     private lateinit var adapter: ChangelogAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Force light mode
+        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+            androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+        )
         super.onCreate(savedInstanceState)
         binding = ActivityChangelogBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -45,12 +49,12 @@ class ChangelogActivity : AppCompatActivity() {
     }
 
     private fun setupCurrentVersion() {
-        // Mostrar la versión actual de la aplicación usando packageManager como alternativa
+        // Mostrar la versión actual de la aplicación de forma segura
         val versionName = try {
             val packageInfo = packageManager.getPackageInfo(packageName, 0)
             packageInfo.versionName
         } catch (e: Exception) {
-            "0.2.4" // Versión por defecto si no se puede obtener
+            BuildConfig.VERSION_NAME
         }
         binding.textCurrentVersion.text = "v$versionName"
     }

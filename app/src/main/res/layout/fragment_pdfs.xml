@@ -6,150 +6,111 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/nestedScroll"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:orientation="vertical">
 
+        <!-- Header con contador de PDFs -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp">
+            android:padding="16dp">
 
-            <!-- Search Bar -->
+            <!-- Contador de PDFs -->
+            <TextView
+                android:id="@+id/textPdfCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/md_theme_light_outline"
+                android:layout_marginBottom="12dp"
+                tools:text="25 PDFs" />
+
+            <!-- Barra de búsqueda -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="24dp"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="8dp">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginStart="8dp"
-                        android:contentDescription="@string/cd_search"
-                        android:src="@drawable/ic_search"
-                        app:tint="?attr/colorOnSurfaceVariant" />
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
 
                     <EditText
                         android:id="@+id/editTextSearch"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:background="@null"
-                        android:hint="@string/hint_search_pdfs"
-                        android:importantForAutofill="no"
+                        android:hint="@string/search_hint"
+                        android:background="@android:color/transparent"
                         android:inputType="text"
-                        android:minHeight="0dp"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="6dp"
-                        android:textSize="16sp" />
+                        android:maxLines="1"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:importantForAutofill="no" />
 
                     <ImageButton
                         android:id="@+id/buttonClearSearch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_close"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/cd_clear_search"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_clear"
-                        android:visibility="gone"
-                        app:tint="?attr/colorOnSurfaceVariant" />
+                        android:visibility="gone" />
+
                 </LinearLayout>
+
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- PDFs Header with count -->
-            <LinearLayout
-                android:layout_width="match_parent"
+        </LinearLayout>
+
+        <!-- Lista de PDFs -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewPdfs"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp"
+            tools:listitem="@layout/item_pdf_history" />
+
+        <!-- Estado vacío -->
+        <LinearLayout
+            android:id="@+id/layoutEmptyState"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="24dp">
+                android:text="@string/pdfs_empty"
+                android:textSize="18sp"
+                android:textColor="@color/md_theme_light_outline"
+                android:gravity="center" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/title_pdf_history"
-                    android:textColor="?attr/colorOnBackground"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/textPdfCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="14sp"
-                    tools:text="12 PDFs" />
-
-            </LinearLayout>
-
-            <!-- PDF History RecyclerView -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewPdfs"
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:paddingHorizontal="16dp"
-                android:paddingBottom="80dp"
-                tools:itemCount="10"
-                tools:listitem="@layout/item_pdf_history" />
-
-            <!-- Empty State -->
-            <LinearLayout
-                android:id="@+id/layoutEmptyState"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginHorizontal="32dp"
-                android:layout_marginTop="80dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <ImageView
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:contentDescription="@string/cd_no_pdfs"
-                    android:src="@drawable/ic_empty_pdf" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/empty_no_pdfs"
-                    android:textColor="?attr/colorOnBackground"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center"
-                    android:text="@string/empty_tap_to_add"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
+                android:text="@string/pdfs_empty_hint"
+                android:textSize="14sp"
+                android:textColor="@color/md_theme_light_outline"
+                android:layout_marginTop="8dp"
+                android:gravity="center" />
 
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
 
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+

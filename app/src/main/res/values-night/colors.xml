@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Night overrides for bottom navigation -->
-    <color name="bottom_nav_active">#7C83FF</color>
+    <color name="bottom_nav_active">#81C784</color>
     <color name="bottom_nav_inactive">#9E9E9E</color>
     <color name="bottom_nav_background">#000000</color>
 </resources>
-

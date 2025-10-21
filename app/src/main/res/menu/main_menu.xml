@@ -3,13 +3,6 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_storage_access"
-        android:title="Acceso a carpeta"
-        android:icon="@android:drawable/ic_menu_sort_by_size"
-        android:orderInCategory="5"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_settings"
         android:title="@string/menu_settings"
         android:icon="@android:drawable/ic_menu_preferences"
@@ -20,11 +13,5 @@
         android:id="@+id/action_changelog"
         android:title="@string/menu_changelog"
         android:orderInCategory="100"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_about"
-        android:title="@string/menu_about"
-        android:orderInCategory="101"
         app:showAsAction="never" />
 </menu>

@@ -3,11 +3,13 @@ package ia.ankherth.grease
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.preference.EditTextPreference
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
@@ -30,12 +32,28 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+    private val openStorageTree = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri: Uri? ->
+        uri?.let {
+            try {
+                contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+                viewModel.setStorageTreeUri(it.toString())
+            } catch (_: SecurityException) { }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Force light mode
+        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+            androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+        )
         ThemeUtils.applyTheme(this)
         super.onCreate(savedInstanceState)
         supportFragmentManager
             .beginTransaction()
-            .replace(android.R.id.content, SettingsFragment(::onPickAvatar))
+            .replace(android.R.id.content, SettingsFragment(::onPickAvatar, ::onStorageAccess, ::onAbout))
             .commit()
     }
 
@@ -43,7 +61,19 @@ class SettingsActivity : AppCompatActivity() {
         pickImage.launch(arrayOf("image/*"))
     }
 
-    class SettingsFragment(private val onPickAvatar: () -> Unit) : PreferenceFragmentCompat() {
+    private fun onStorageAccess() {
+        openStorageTree.launch(null)
+    }
+
+    private fun onAbout() {
+        startActivity(Intent(this, AboutActivity::class.java))
+    }
+
+    class SettingsFragment(
+        private val onPickAvatar: () -> Unit,
+        private val onStorageAccess: () -> Unit,
+        private val onAbout: () -> Unit
+    ) : PreferenceFragmentCompat() {
         private val viewModel: MainViewModel by lazy { (requireActivity() as SettingsActivity).viewModel }
 
         private var hapticsPref: SwitchPreferenceCompat? = null
@@ -71,6 +101,35 @@ class SettingsActivity : AppCompatActivity() {
             }
             hapticsPref?.setOnPreferenceChangeListener { _, newValue ->
                 viewModel.setHapticsEnabled((newValue as? Boolean) == true)
+                true
+            }
+
+            // Language preference
+            val languagePref = findPreference<ListPreference>("pref_language")
+            languagePref?.setOnPreferenceChangeListener { _, newValue ->
+                val lang = (newValue as? String).orEmpty()
+                val locales = if (lang == "system" || lang.isBlank()) {
+                    LocaleListCompat.getEmptyLocaleList()
+                } else {
+                    LocaleListCompat.forLanguageTags(lang)
+                }
+                AppCompatDelegate.setApplicationLocales(locales)
+                // recreate to apply
+                requireActivity().recreate()
+                true
+            }
+
+            // Storage access preference
+            val storagePref = findPreference<Preference>("pref_storage_access")
+            storagePref?.setOnPreferenceClickListener {
+                onStorageAccess()
+                true
+            }
+
+            // About preference
+            val aboutPref = findPreference<Preference>("pref_about")
+            aboutPref?.setOnPreferenceClickListener {
+                onAbout()
                 true
             }
         }

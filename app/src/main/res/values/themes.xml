@@ -17,6 +17,11 @@
         <item name="colorSurface">@color/md_theme_light_surface</item>
         <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
 
+        <!-- Custom popup menu style with rounded corners -->
+        <item name="popupMenuStyle">@style/Widget.PDFTOON.PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/Widget.PDFTOON.PopupMenu</item>
+        <item name="actionOverflowMenuStyle">@style/Widget.PDFTOON.PopupMenu.Overflow</item>
+
         <!-- Transparent system bars; icons dark in light mode -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
@@ -24,7 +29,7 @@
         <item name="android:windowLightNavigationBar">true</item>
 
         <!-- Solid white background in light mode -->
-        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowBackground">@color/md_theme_light_surface</item>
     </style>
 
     <style name="Theme.PDFTOON.NoActionBar" parent="Theme.PDFTOON">
@@ -55,11 +60,17 @@
         <item name="colorOnTertiaryContainer">@color/md_theme_light_onTertiaryContainer</item>
         <item name="colorSurface">@color/md_theme_light_surface</item>
         <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+
+        <!-- Custom popup menu style with rounded corners -->
+        <item name="popupMenuStyle">@style/Widget.PDFTOON.PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/Widget.PDFTOON.PopupMenu</item>
+        <item name="actionOverflowMenuStyle">@style/Widget.PDFTOON.PopupMenu.Overflow</item>
+
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
-        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowBackground">@color/md_theme_dark_surface</item>
     </style>
 
     <style name="Theme.PDFTOON.Light.NoActionBar" parent="Theme.PDFTOON.Light">
@@ -91,6 +102,12 @@
         <item name="colorSurface">@color/md_theme_dark_surface</item>
         <item name="colorOnSurface">@color/md_theme_dark_onSurface</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+
+        <!-- Custom popup menu style -->
+        <item name="popupMenuStyle">@style/Widget.PDFTOON.PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/Widget.PDFTOON.PopupMenu</item>
+        <item name="actionOverflowMenuStyle">@style/Widget.PDFTOON.PopupMenu.Overflow</item>
+
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
@@ -118,6 +135,12 @@
         <item name="colorOnSurface">@color/white</item>
         <item name="colorPrimary">@color/md_theme_dark_primary</item>
         <item name="colorOnPrimary">@color/md_theme_dark_onPrimary</item>
+
+        <!-- Custom popup menu style with rounded corners -->
+        <item name="popupMenuStyle">@style/Widget.PDFTOON.PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/Widget.PDFTOON.PopupMenu</item>
+        <item name="actionOverflowMenuStyle">@style/Widget.PDFTOON.PopupMenu.Overflow</item>
+
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/black</item>
         <item name="android:windowLightStatusBar">false</item>

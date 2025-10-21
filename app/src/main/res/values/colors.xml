@@ -21,6 +21,7 @@
     <color name="md_theme_light_surface">#FFFFFFFF</color>
     <color name="md_theme_light_onSurface">#121212</color>
     <color name="md_theme_light_surfaceVariant">#E3F2E6</color>
+    <color name="md_theme_light_onSurfaceVariant">#4A5C4C</color>
     <color name="md_theme_light_outline">#729874</color>
     <color name="md_theme_light_error">#B00020</color>
     <color name="md_theme_light_onError">#FFFFFF</color>
@@ -76,7 +77,7 @@
     <color name="white">#FFFFFFFF</color>
 
     <!-- Bottom Navigation specific colors -->
-    <color name="bottom_nav_active">#6366F1</color>
+    <color name="bottom_nav_active">#2E7D32</color>
     <color name="bottom_nav_inactive">#B0B0B0</color>
     <color name="bottom_nav_background">#FFFFFFFF</color>
 </resources>

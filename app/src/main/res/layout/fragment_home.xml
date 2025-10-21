@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.core.widget.NestedScrollView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -15,7 +17,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Header with greeting and avatar -->
+            <!-- Header con avatar y saludo -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -23,31 +25,76 @@
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
 
+                <ImageView
+                    android:id="@+id/imageUserAvatar"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_default_avatar"
+                    android:contentDescription="@string/cd_user_avatar" />
+
                 <TextView
                     android:id="@+id/textGreeting"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Buenos días, Usuario"
+                    android:layout_marginStart="12dp"
                     android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:textColor="@color/md_theme_light_onBackground"
+                    tools:text="Hola!" />
 
-                <ImageView
-                    android:id="@+id/imageUserAvatar"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/ic_person"
-                    android:contentDescription="Avatar de usuario" />
             </LinearLayout>
 
-            <!-- Continue Reading Card -->
+            <!-- Barra de búsqueda -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <EditText
+                        android:id="@+id/editTextSearch"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/search_hint"
+                        android:background="@android:color/transparent"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:importantForAutofill="no" />
+
+                    <ImageButton
+                        android:id="@+id/buttonClearSearch"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_close"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/cd_clear_search"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Tarjeta de continuar leyendo -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardContinueReading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                app:cardElevation="4dp"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -59,57 +106,40 @@
                         android:id="@+id/textContinueReadingTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Documento.pdf"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="@color/md_theme_light_onSurface"
+                        tools:text="Documento.pdf" />
 
                     <TextView
                         android:id="@+id/textContinueReadingProgress"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Página 10 / 50"
-                        android:layout_marginTop="4dp" />
+                        android:layout_marginTop="4dp"
+                        android:textSize="14sp"
+                        android:textColor="@color/md_theme_light_outline"
+                        tools:text="Página 5 de 20 (25%)" />
 
                     <Button
                         android:id="@+id/buttonContinueReading"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Continuar leyendo"
-                        android:layout_marginTop="8dp" />
+                        android:layout_marginTop="8dp"
+                        android:text="@string/continue_reading" />
+
                 </LinearLayout>
+
             </androidx.cardview.widget.CardView>
 
-            <!-- Search Bar -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-
-                <EditText
-                    android:id="@+id/editTextSearch"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="Buscar PDFs..."
-                    android:inputType="text" />
-
-                <ImageButton
-                    android:id="@+id/buttonClearSearch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@android:drawable/ic_menu_close_clear_cancel"
-                    android:contentDescription="Limpiar búsqueda"
-                    android:visibility="gone" />
-            </LinearLayout>
-
-            <!-- RecyclerView for PDFs -->
+            <!-- Lista de PDFs -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewPdfs"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                tools:listitem="@layout/item_pdf_history" />
 
-            <!-- Empty State -->
+            <!-- Estado vacío -->
             <LinearLayout
                 android:id="@+id/layoutEmptyState"
                 android:layout_width="match_parent"
@@ -122,13 +152,16 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="No hay PDFs recientes"
-                    android:textSize="18sp" />
+                    android:text="@string/home_empty_recent"
+                    android:textSize="18sp"
+                    android:textColor="@color/md_theme_light_outline"
+                    android:gravity="center" />
+
             </LinearLayout>
 
         </LinearLayout>
 
-    </androidx.core.widget.NestedScrollView>
+    </ScrollView>
 
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

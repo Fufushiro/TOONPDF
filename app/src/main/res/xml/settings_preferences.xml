@@ -1,24 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <PreferenceCategory android:title="Perfil">
+    <PreferenceCategory android:title="@string/settings_category_profile">
         <EditTextPreference
             android:key="pref_user_name"
-            android:title="Nombre de usuario"
+            android:title="@string/settings_user_name_title"
             app:useSimpleSummaryProvider="true"
-            android:dialogTitle="Escribe tu nombre" />
+            android:dialogTitle="@string/settings_user_name_dialog" />
         <Preference
             android:key="pref_user_avatar"
-            android:title="Cambiar foto de inicio"
-            android:summary="Selecciona una imagen de tu galería" />
+            android:title="@string/settings_change_home_photo"
+            android:summary="@string/settings_change_home_photo_summary" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Interacción">
+    <PreferenceCategory android:title="@string/settings_category_interaction">
         <SwitchPreferenceCompat
             android:key="pref_haptics"
-            android:title="Vibración al pulsar"
-            android:summaryOn="Las acciones producirán una ligera vibración"
-            android:summaryOff="Desactivado"
+            android:title="@string/settings_haptics_title"
+            android:summaryOn="@string/settings_haptics_summary_on"
+            android:summaryOff="@string/settings_haptics_summary_off"
             android:defaultValue="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/settings_category_other">
+        <ListPreference
+            android:key="pref_language"
+            android:title="@string/settings_language_title"
+            android:entries="@array/language_entries"
+            android:entryValues="@array/language_values"
+            app:useSimpleSummaryProvider="true"
+            android:defaultValue="system" />
+
+        <Preference
+            android:key="pref_storage_access"
+            android:title="@string/settings_storage_access_title"
+            android:summary="@string/settings_storage_access_summary"
+            android:icon="@android:drawable/ic_menu_sort_by_size" />
+        <Preference
+            android:key="pref_about"
+            android:title="@string/menu_about"
+            android:summary="@string/settings_about_summary" />
     </PreferenceCategory>
 </PreferenceScreen>

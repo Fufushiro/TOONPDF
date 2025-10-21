@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="pref_theme_entries">
-        <item>Claro</item>
+        <item>Light</item>
     </string-array>
     <string-array name="pref_theme_values">
         <item>light</item>
@@ -9,9 +9,9 @@
 
     <!-- Language selector entries/values -->
     <string-array name="language_entries">
-        <item>Usar idioma del sistema</item>
-        <item>Español</item>
-        <item>Inglés</item>
+        <item>Use system language</item>
+        <item>Spanish</item>
+        <item>English</item>
     </string-array>
     <string-array name="language_values">
         <item>system</item>

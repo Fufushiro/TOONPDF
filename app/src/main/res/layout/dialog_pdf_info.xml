@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:fillViewport="true">
@@ -15,7 +16,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Información del archivo"
+            android:text="@string/dialog_pdf_info_title"
             android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="@color/md_theme_light_onSurface"
@@ -32,7 +33,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nombre"
+                android:text="@string/dialog_pdf_info_name"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="@color/md_theme_light_primary"
@@ -42,7 +43,7 @@
                 android:id="@+id/tvFileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Documento.pdf"
+                tools:text="Documento.pdf"
                 android:textSize="15sp"
                 android:textColor="@color/md_theme_light_onSurface"
                 android:layout_marginTop="4dp"
@@ -60,7 +61,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tamaño"
+                android:text="@string/dialog_pdf_info_size"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="@color/md_theme_light_primary"
@@ -70,7 +71,7 @@
                 android:id="@+id/tvFileSize"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="2.5 MB"
+                tools:text="2.5 MB"
                 android:textSize="15sp"
                 android:textColor="@color/md_theme_light_onSurface"
                 android:layout_marginTop="4dp"
@@ -88,7 +89,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ubicación"
+                android:text="@string/dialog_pdf_info_location"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="@color/md_theme_light_primary"
@@ -98,7 +99,7 @@
                 android:id="@+id/tvFilePath"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="/storage/emulated/0/Download/"
+                tools:text="/storage/emulated/0/Download/"
                 android:textSize="15sp"
                 android:textColor="@color/md_theme_light_onSurface"
                 android:layout_marginTop="4dp"
@@ -118,7 +119,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total de páginas"
+                android:text="@string/dialog_pdf_info_total_pages"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="@color/md_theme_light_primary"
@@ -128,7 +129,7 @@
                 android:id="@+id/tvTotalPages"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="150 páginas"
+                tools:text="150"
                 android:textSize="15sp"
                 android:textColor="@color/md_theme_light_onSurface"
                 android:layout_marginTop="4dp"
@@ -146,7 +147,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Progreso de lectura"
+                android:text="@string/dialog_pdf_info_reading_progress"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="@color/md_theme_light_primary"
@@ -156,7 +157,7 @@
                 android:id="@+id/tvProgress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Página 45 de 150 (30%)"
+                tools:text="Página 45 de 150 (30%)"
                 android:textSize="15sp"
                 android:textColor="@color/md_theme_light_onSurface"
                 android:layout_marginTop="4dp"
@@ -174,7 +175,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Última lectura"
+                android:text="@string/dialog_pdf_info_last_read"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="@color/md_theme_light_primary"
@@ -184,7 +185,7 @@
                 android:id="@+id/tvLastRead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hace 2 horas"
+                tools:text="Hace 2 horas"
                 android:textSize="15sp"
                 android:textColor="@color/md_theme_light_onSurface"
                 android:layout_marginTop="4dp"
@@ -197,11 +198,10 @@
             android:id="@+id/btnClose"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cerrar"
+            android:text="@string/dialog_close"
             android:layout_marginTop="8dp"
             app:cornerRadius="12dp" />
 
     </LinearLayout>
 
 </ScrollView>
-

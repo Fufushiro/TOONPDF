@@ -11,7 +11,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PDFTOON">
+        android:theme="@style/Theme.PDFTOON"
+        android:localeConfig="@xml/locales_config">
 
         <!-- Main Activity - Library View -->
         <activity
@@ -41,7 +42,7 @@
         <activity
             android:name=".SettingsActivity"
             android:exported="false"
-            android:label="Ajustes"
+            android:label="@string/menu_settings"
             android:theme="@style/Theme.PDFTOON.NoActionBar" />
 
         <!-- Changelog Activity -->
@@ -49,7 +50,14 @@
             android:name=".ChangelogActivity"
             android:exported="false"
             android:theme="@style/Theme.PDFTOON.NoActionBar"
-            android:label="Historial de cambios" />
+            android:label="@string/title_changelog" />
+
+        <!-- About Activity -->
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false"
+            android:theme="@style/Theme.PDFTOON.NoActionBar"
+            android:label="@string/menu_about" />
 
     </application>
 
