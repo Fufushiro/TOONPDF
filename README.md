@@ -180,19 +180,10 @@ keyPassword=TU_PASSWORD_ALIAS
 - ✅ Exportación cifrable del historial (JSON local)
 - ✅ Sin permisos de almacenamiento invasivos (usa SAF)
 
-
-## 🎯 Roadmap
-- [ ] Anotaciones y marcadores en PDF
-- [ ] Modo de lectura nocturna con filtro
-- [ ] Sincronización en la nube (opcional)
-- [ ] Soporte para otros formatos (EPUB, MOBI)
-- [ ] Gestos personalizables
-- [ ] Temas de color personalizados
-
 ## 👨‍💻 Desarrollador
 **fufushiro**
 
-PDFTOON v5.0.2 - Lector de PDF moderno y optimizado para Android
+PDFTOON v5.0.0 - Lector de PDF moderno y optimizado para Android
 
 ## 📄 Licencia
 MIT. Ver `LICENSE`.
