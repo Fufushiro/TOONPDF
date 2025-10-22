@@ -1,8 +1,13 @@
 package ia.ankherth.grease.adapter
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -60,12 +65,10 @@ class PdfHistoryAdapter(
             // Mostrar progreso y última lectura
             val progressText = if (pdf.totalPages > 0) {
                 val percentage = ((pdf.lastPageRead.toFloat() / pdf.totalPages) * 100).toInt()
-                progressBar.progress = percentage
-                tvProgress.text = "$percentage%"
+                animateProgress(progressBar, tvProgress, percentage)
                 "Página ${pdf.lastPageRead + 1} de ${pdf.totalPages} • ${getRelativeTime(pdf.lastReadDate)}"
             } else {
-                progressBar.progress = 0
-                tvProgress.text = "0%"
+                animateProgress(progressBar, tvProgress, 0)
                 "Página ${pdf.lastPageRead + 1} • ${getRelativeTime(pdf.lastReadDate)}"
             }
             tvPdfMeta.text = progressText
@@ -78,6 +81,46 @@ class PdfHistoryAdapter(
                 itemView.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
                 showOptionsBottomSheet(pdf)
                 true
+            }
+        }
+
+        /**
+         * Anima la barra de progreso y el texto del porcentaje con efectos suaves
+         */
+        private fun animateProgress(progressBar: ProgressBar, tvProgress: TextView, targetProgress: Int) {
+            val currentProgress = progressBar.progress
+
+            // Animación de la barra de progreso
+            val progressAnimator = ObjectAnimator.ofInt(progressBar, "progress", currentProgress, targetProgress).apply {
+                duration = 800 // 800ms para una animación suave
+                interpolator = AccelerateDecelerateInterpolator()
+            }
+
+            // Animación del texto del porcentaje con contador animado
+            val textAnimator = ValueAnimator.ofInt(currentProgress, targetProgress).apply {
+                duration = 800
+                interpolator = AccelerateDecelerateInterpolator()
+                addUpdateListener { animator ->
+                    val animatedValue = animator.animatedValue as Int
+                    tvProgress.text = "$animatedValue%"
+                }
+            }
+
+            // Efecto de escala pulsante en la barra de progreso
+            val scaleXAnimator = ObjectAnimator.ofFloat(progressBar, "scaleY", 1f, 1.15f, 1f).apply {
+                duration = 400
+                interpolator = OvershootInterpolator()
+            }
+
+            // Efecto de fade en el texto
+            val fadeAnimator = ObjectAnimator.ofFloat(tvProgress, "alpha", 0.5f, 1f).apply {
+                duration = 400
+            }
+
+            // Ejecutar todas las animaciones juntas
+            AnimatorSet().apply {
+                playTogether(progressAnimator, textAnimator, scaleXAnimator, fadeAnimator)
+                start()
             }
         }
 

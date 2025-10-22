@@ -51,7 +51,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp"
-                    android:paddingBottom="88dp">
+                    android:paddingBottom="104dp">
 
                     <!-- Header con Avatar y Saludo -->
                     <LinearLayout
@@ -139,11 +139,12 @@
                         android:foreground="?attr/selectableItemBackground">
 
                         <LinearLayout
+                            android:id="@+id/cardLastPdfContent"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:padding="16dp"
-                            android:background="@drawable/gradient_card_background">
+                            android:background="?attr/colorSurfaceVariant">
 
                             <!-- Contenido de texto -->
                             <LinearLayout
@@ -299,7 +300,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:clipToPadding="false"
-                        tools:itemCount="5"
+                        tools:itemCount="6"
                         tools:listitem="@layout/item_pdf_history" />
 
                 </LinearLayout>

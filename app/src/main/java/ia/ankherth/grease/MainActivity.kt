@@ -1,12 +1,22 @@
 package ia.ankherth.grease
 
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
+import android.animation.ObjectAnimator
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ClipDrawable
+import android.graphics.drawable.LayerDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.AnimationUtils
+import android.view.animation.LinearInterpolator
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Button
@@ -16,6 +26,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -29,6 +40,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.snackbar.Snackbar
 import ia.ankherth.grease.adapter.PdfHistoryAdapter
+import kotlinx.coroutines.Dispatchers
 import ia.ankherth.grease.data.room.PdfHistoryEntity
 import ia.ankherth.grease.util.ThemeUtils
 import ia.ankherth.grease.viewmodel.MainViewModel
@@ -59,6 +71,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mainContentScroll: ScrollView
     private lateinit var tvWelcomeMessage: TextView
     private lateinit var cardLastPdf: MaterialCardView
+    private lateinit var cardLastPdfContent: View
     private lateinit var tvPdfTitle: TextView
     private lateinit var tvPdfMeta: TextView
     private lateinit var tvLastRead: TextView
@@ -70,8 +83,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var ivUserAvatar: android.widget.ImageView
     private lateinit var cardAvatar: MaterialCardView
 
+    // Animator references (to avoid duplicates and allow dynamic updates)
+    private var progressAnimator: ValueAnimator? = null
+    private var shakeAnimator: ObjectAnimator? = null
+
     // Adapter
     private lateinit var recentPdfsAdapter: PdfHistoryAdapter
+
+    // PDF Card Colorizer para aplicar colores dinámicos
+    private lateinit var pdfCardColorizer: ia.ankherth.grease.util.PdfCardColorizer
 
     // SAF registrars
     private val openPdf = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
@@ -158,6 +178,7 @@ class MainActivity : AppCompatActivity() {
         mainContentScroll = findViewById(R.id.mainContentScroll)
         tvWelcomeMessage = findViewById(R.id.tvWelcomeMessage)
         cardLastPdf = findViewById(R.id.cardLastPdf)
+        cardLastPdfContent = findViewById(R.id.cardLastPdfContent)
         tvPdfTitle = findViewById(R.id.tvPdfTitle)
         tvPdfMeta = findViewById(R.id.tvPdfMeta)
         tvLastRead = findViewById(R.id.tvLastRead)
@@ -166,6 +187,9 @@ class MainActivity : AppCompatActivity() {
         emptyStateContainer = findViewById(R.id.emptyStateContainer)
         recyclerViewRecentPdfs = findViewById(R.id.recyclerViewRecentPdfs)
         ivPdfPreview = findViewById(R.id.ivPdfPreview)
+        // Inicializar el colorizer para aplicar colores dinámicos del PDF
+        pdfCardColorizer = ia.ankherth.grease.util.PdfCardColorizer(this, lifecycleScope)
+
         ivUserAvatar = findViewById(R.id.ivUserAvatar)
         cardAvatar = findViewById(R.id.cardAvatar)
 
@@ -278,6 +302,7 @@ class MainActivity : AppCompatActivity() {
                 // Mostrar diálogo de confirmación para eliminar al mantener presionado
                 performHaptic()
                 showDeletePdfDialog(pdf)
+
             }
         )
 
@@ -306,8 +331,10 @@ class MainActivity : AppCompatActivity() {
                 viewModel.refreshPdfs()
                 // Detener la animación de refresh
                 swipeRefreshLayout.isRefreshing = false
-                // Mostrar feedback al usuario
-                Snackbar.make(rootView, "Lista actualizada", Snackbar.LENGTH_SHORT).show()
+                // Mostrar feedback al usuario en la parte superior
+                Snackbar.make(toolbar, "Lista actualizada", Snackbar.LENGTH_SHORT)
+                    .setAnchorView(toolbar)
+                    .show()
             }
         }
 
@@ -338,7 +365,8 @@ class MainActivity : AppCompatActivity() {
                     0
                 }
 
-                progressBar.progress = progressPercentage
+                // Actualizar el progreso con animación y cambio de color
+                updateProgressBarWithAnimation(progressPercentage)
 
                 tvProgress.text = if (totalPages > 0) {
                     getString(R.string.pdf_progress_percentage, progressPercentage)
@@ -355,6 +383,9 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 tvLastRead.text = getString(R.string.pdf_last_read, getRelativeTime(mostRecent.lastReadDate))
+
+                // Aplicar colores dinámicos extraídos del PDF
+                applyPdfDynamicColors(mostRecent)
 
                 mostRecent.thumbnailPath?.let { path ->
                     ivPdfPreview.load(File(path)) {
@@ -373,8 +404,8 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
 
-                // Lista secundaria: siguientes 4 PDFs (para un total de 5 incluyendo el principal)
-                recentPdfsAdapter.submitList(pdfs.drop(1).take(4))
+                // Lista secundaria: siguientes 6 PDFs (para un total de 7 incluyendo el principal)
+                recentPdfsAdapter.submitList(pdfs.drop(1).take(6))
                 recyclerViewRecentPdfs.isVisible = pdfs.size > 1
 
             } else {
@@ -386,9 +417,9 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.userName.observe(this) { name ->
             tvWelcomeMessage.text = if (!name.isNullOrBlank()) {
-                "Bienvenido, $name"
+                getString(R.string.welcome_user, name)
             } else {
-                "Bienvenido de vuelta"
+                getString(R.string.welcome_back)
             }
         }
 
@@ -466,6 +497,85 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    /**
+     * Aplica colores dinámicos extraídos del PDF a la tarjeta de forma elegante.
+     * Esta función es lifecycle-aware y se ejecuta en un hilo secundario.
+     */
+    private fun applyPdfDynamicColors(pdf: PdfHistoryEntity) {
+        android.util.Log.d("MainActivity", "=== applyPdfDynamicColors START ===")
+        android.util.Log.d("MainActivity", "PDF fileName: ${pdf.fileName}")
+        android.util.Log.d("MainActivity", "PDF filePath: ${pdf.filePath}")
+        android.util.Log.d("MainActivity", "PDF uri: ${pdf.uri}")
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            android.util.Log.d("MainActivity", "Inside coroutine scope")
+            try {
+                // Intentar obtener el archivo desde el filePath
+                val pdfFile = if (!pdf.filePath.isNullOrBlank()) {
+                    android.util.Log.d("MainActivity", "Using filePath: ${pdf.filePath}")
+                    File(pdf.filePath)
+                } else {
+                    // Fallback: intentar obtener desde URI usando ContentResolver
+                    android.util.Log.d("MainActivity", "filePath is null/blank, using URI: ${pdf.uri}")
+                    getPdfFileFromUri(pdf.uri)
+                }
+
+                android.util.Log.d("MainActivity", "pdfFile: $pdfFile")
+                android.util.Log.d("MainActivity", "pdfFile exists: ${pdfFile?.exists()}")
+                android.util.Log.d("MainActivity", "pdfFile canRead: ${pdfFile?.canRead()}")
+
+                if (pdfFile != null && pdfFile.exists() && pdfFile.canRead()) {
+                    android.util.Log.d("MainActivity", "✓ PDF file is accessible: ${pdfFile.absolutePath}")
+                    // Aplicar colores dinámicos usando el colorizer
+                    pdfCardColorizer.applyPdfColorToCard(
+                        pdfFile = pdfFile,
+                        cardContentContainer = cardLastPdfContent,
+                        titleTextView = tvPdfTitle,
+                        metaTextView = tvPdfMeta,
+                        progressTextView = tvProgress,
+                        lastReadTextView = tvLastRead,
+                        progressBar = progressBar
+                    )
+                } else {
+                    android.util.Log.e("MainActivity", "✗ PDF file NOT accessible!")
+                    android.util.Log.e("MainActivity", "  - pdfFile path: ${pdfFile?.absolutePath}")
+                    android.util.Log.e("MainActivity", "  - exists: ${pdfFile?.exists()}")
+                    android.util.Log.e("MainActivity", "  - canRead: ${pdfFile?.canRead()}")
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("MainActivity", "✗ Exception in applyPdfDynamicColors: ${e.message}", e)
+                e.printStackTrace()
+            }
+            android.util.Log.d("MainActivity", "=== applyPdfDynamicColors END ===")
+        }
+    }
+
+    /**
+     * Obtiene el archivo PDF desde el URI usando ContentResolver.
+     * Retorna null si no se puede acceder al archivo.
+     */
+    private fun getPdfFileFromUri(uriString: String): File? {
+        return try {
+            val uri = uriString.toUri()
+            // Crear archivo temporal en caché para procesamiento
+            val tempFile = File(cacheDir, "temp_pdf_${System.currentTimeMillis()}.pdf")
+
+            contentResolver.openInputStream(uri)?.use { input ->
+                tempFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+
+            if (tempFile.exists() && tempFile.length() > 0) {
+                tempFile
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     private fun openLastPdfOrPrompt() {
         lifecycleScope.launch {
             val lastPdf = viewModel.getLastOpenedPdf()
@@ -523,6 +633,177 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    // Update the ProgressBar with a shake animation and smooth color grading.
+    // - If the animation crosses the 80% threshold it runs in two phases: [start..80] (normal) and [80..target] (accelerated).
+    // - Shake starts when reaching 80% and its speed increases as progress approaches 100%.
+    // - Color smoothly interpolates between the primary color and red in the 85..100 range.
+    private fun updateProgressBarWithAnimation(progress: Int) {
+        // Cancelar animadores previos
+        progressAnimator?.cancel()
+        progressAnimator = null
+
+        val startProgress = progressBar.progress
+        if (startProgress == progress) {
+            // Ajustar shake si corresponde
+            if (progress >= 80) ensureShakeForProgress(progress) else stopShake()
+            return
+        }
+
+        // Helper para aplicar color según valor actual
+        fun applyColorForValue(value: Int) {
+            val color = when {
+                value < 85 -> ContextCompat.getColor(this@MainActivity, R.color.md_theme_light_primary)
+                value >= 100 -> Color.parseColor("#D32F2F")
+                else -> {
+                    val greenColor = ContextCompat.getColor(this@MainActivity, R.color.md_theme_light_primary)
+                    val redColor = Color.parseColor("#D32F2F")
+                    val factor = (value - 85) / 15f
+                    @Suppress("DEPRECATION")
+                    ArgbEvaluator().evaluate(factor, greenColor, redColor) as Int
+                }
+            }
+
+            val progressDrawable = progressBar.progressDrawable as? LayerDrawable
+            progressDrawable?.let { layerDrawable ->
+                val progressLayer = layerDrawable.findDrawableByLayerId(android.R.id.progress)
+                if (progressLayer is ClipDrawable) {
+                    progressLayer.drawable?.setTint(color)
+                } else {
+                    progressLayer?.setTint(color)
+                }
+            }
+        }
+
+        // Si la animación cruza 80% y necesitamos dividir en fases
+        if (startProgress < 80 && progress >= 80) {
+            // Fase 1: start -> 80 (ritmo normal)
+            val diff1 = 80 - startProgress
+            val duration1 = (diff1 * 25).coerceAtLeast(220).toLong()
+
+            val anim1 = ValueAnimator.ofInt(startProgress, 80).apply {
+                duration = duration1
+                interpolator = android.view.animation.DecelerateInterpolator()
+                addUpdateListener { a ->
+                    val cur = a.animatedValue as Int
+                    progressBar.progress = cur
+                    applyColorForValue(cur)
+                }
+            }
+
+            // Fase 2: 80 -> progress (acelerada; más progreso -> más rápida)
+            val diff2 = progress - 80
+            val duration2 = ((diff2 * 12).coerceAtLeast(160)).toLong()
+            val anim2 = ValueAnimator.ofInt(80, progress).apply {
+                duration = duration2
+                interpolator = android.view.animation.AccelerateDecelerateInterpolator()
+                addUpdateListener { a ->
+                    val cur = a.animatedValue as Int
+                    progressBar.progress = cur
+                    applyColorForValue(cur)
+                    // Mientras avanzamos por encima de 80, actualizar la velocidad del temblor
+                    ensureShakeForProgress(cur)
+                }
+            }
+
+            // Enlazar animadores secuencialmente
+            anim1.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    // Arrancar anim2 y guardar referencia
+                    progressAnimator = anim2
+                    anim2.start()
+                }
+
+                override fun onAnimationCancel(animation: Animator) {
+                    progressAnimator = null
+                }
+            })
+
+            anim2.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    progressAnimator = null
+                    // Si el objetivo final es menor que 80 (no debería aquí), detener temblor
+                    if (progress < 80) stopShake()
+                }
+
+                override fun onAnimationCancel(animation: Animator) {
+                    progressAnimator = null
+                }
+            })
+
+            // Guardar referencia y arrancar la primera fase
+            progressAnimator = anim1
+            anim1.start()
+            return
+        }
+
+        // Si empezamos ya >=80 o no cruzamos 80, animar en una sola fase
+        val baseDiff = kotlin.math.abs(progress - startProgress)
+        val baseDuration = when {
+            startProgress >= 80 -> (baseDiff * 12).coerceAtLeast(160)
+            else -> (baseDiff * 20).coerceAtLeast(220)
+        }
+
+        progressAnimator = ValueAnimator.ofInt(startProgress, progress).apply {
+            duration = baseDuration.toLong()
+            interpolator = android.view.animation.DecelerateInterpolator()
+            addUpdateListener { a ->
+                val cur = a.animatedValue as Int
+                progressBar.progress = cur
+                applyColorForValue(cur)
+
+                if (cur >= 80) ensureShakeForProgress(cur) else stopShake()
+            }
+
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    progressAnimator = null
+                }
+
+                override fun onAnimationCancel(animation: Animator) {
+                    progressAnimator = null
+                }
+            })
+
+            start()
+        }
+    }
+
+    // Asegura que el ObjectAnimator de "shake" exista y su duración se ajuste según el progreso (80..100)
+    private fun ensureShakeForProgress(current: Int) {
+        // Mapear current [80..100] a shake duration [900ms .. 180ms] inversamente proporcional
+        val clamped = current.coerceIn(80, 100)
+        val mappedDuration = ((100 - clamped) * 36 + 180).toLong().coerceAtLeast(120L)
+
+        if (shakeAnimator == null) {
+            shakeAnimator = ObjectAnimator.ofFloat(progressBar, "translationX", -6f, 6f).apply {
+                duration = mappedDuration
+                repeatMode = ValueAnimator.REVERSE
+                repeatCount = ValueAnimator.INFINITE
+                interpolator = LinearInterpolator()
+                start()
+            }
+        } else {
+            if (shakeAnimator?.duration != mappedDuration) {
+                shakeAnimator?.duration = mappedDuration
+            }
+            if (!shakeAnimator!!.isStarted) shakeAnimator!!.start()
+        }
+    }
+
+    private fun stopShake() {
+        shakeAnimator?.cancel()
+        shakeAnimator = null
+        progressBar.translationX = 0f
+    }
+
+    override fun onDestroy() {
+        progressAnimator?.cancel()
+        progressAnimator = null
+        shakeAnimator?.cancel()
+        shakeAnimator = null
+        super.onDestroy()
     }
 
     @Suppress("UNUSED_PARAMETER")

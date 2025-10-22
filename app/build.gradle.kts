@@ -17,8 +17,8 @@ android {
         applicationId = "ia.ankherth.grease"
         minSdk = 29
         targetSdk = 36
-        versionCode = 10
-        versionName = "5.0.0"
+        versionCode = 11
+        versionName = "5.1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -198,6 +198,9 @@ dependencies {
 
     // Gson para serialización JSON
     implementation(libs.google.gson)
+
+    // Palette para extracción de colores
+    implementation("androidx.palette:palette-ktx:1.0.0")
 
     // Room Database para persistencia robusta (KSP)
     implementation(libs.androidx.room.runtime)

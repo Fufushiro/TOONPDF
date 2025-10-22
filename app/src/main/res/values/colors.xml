@@ -80,4 +80,7 @@
     <color name="bottom_nav_active">#2E7D32</color>
     <color name="bottom_nav_inactive">#B0B0B0</color>
     <color name="bottom_nav_background">#FFFFFFFF</color>
+
+    <!-- PDF Card default color -->
+    <color name="default_card_color">#6200EE</color>
 </resources>

@@ -43,7 +43,7 @@
             android:name=".SettingsActivity"
             android:exported="false"
             android:label="@string/menu_settings"
-            android:theme="@style/Theme.PDFTOON.NoActionBar" />
+            android:theme="@style/Theme.PDFTOON.Settings" />
 
         <!-- Changelog Activity -->
         <activity

@@ -76,6 +76,7 @@
     <string name="good_morning_user">Good morning, User</string>
     <string name="continue_reading">Continue reading</string>
     <string name="welcome_back">Welcome back</string>
+    <string name="welcome_user">Welcome, %1$s</string>
     <string name="keep_reading">Keep reading</string>
     <string name="sample_pdf_name">Document.pdf</string>
     <string name="sample_pdf_intro">Introduction to UI Design.pdf</string>

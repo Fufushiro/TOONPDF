@@ -1,4 +1,4 @@
-# PDFTOON v5.0.0
+# PDFTOON v5.1.2
 
 Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblioteca digital", historial persistente y modo de lectura inmersivo.
 
@@ -8,7 +8,41 @@ Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblio
   <img src="screenshots/home-screen.png" alt="Pantalla Principal" width="300"/>
 </p>
 
-## � ¿Qué hay de nuevo en 5.0.0?
+## 🆕 ¿Qué hay de nuevo en 5.1.2?
+
+### 🎨 Visor de PDF con Diseño Material You Mejorado
+- **Toolbars semi-transparentes**: Efecto glassmorphism elegante con fondo blanco translúcido (#CCFFFFFF) que deja ver el PDF detrás
+- **Diseño compacto y redondeado**: Barras con esquinas completamente redondeadas (24dp) y márgenes flotantes de 12dp
+- **Elevación sutil**: Elevación de 6dp para un efecto de profundidad moderno
+- **Tipografía optimizada**: Tamaños de fuente reducidos (16sp para páginas, 14sp para porcentaje) para mayor densidad
+- **Colores Material You**: Uso consistente de la paleta de colores primaria y variantes de superficie
+
+### ⚡ Animación Avanzada de Progreso de Lectura
+- **Animación suave del progreso**: La barra de progreso se anima con interpolación suave al cambiar de página
+- **Cambio de color gradual**: Transición progresiva de verde a rojo entre 85% y 100%
+  - Verde primario (< 85%)
+  - Transición gradual verde → rojo (85-99%)
+  - Rojo intenso (#D32F2F) al 100%
+- **Efecto de "temblor" (shake)**: La barra comienza a temblar al pasar del 80% de lectura
+- **Velocidad del temblor aumenta**: El temblor se acelera gradualmente mientras te acercas al 100%
+## ✨ Características Principales
+- **Sincronización del color del texto**: El porcentaje cambia de color junto con la barra
+### 📖 Visor de PDF Rediseñado (v5.1.2)
+- **Toolbars semi-transparentes**: Efecto glassmorphism moderno con fondo blanco translúcido
+- **Diseño Material You compacto**: Esquinas redondeadas (24dp), márgenes flotantes y elevación sutil
+- **Animación avanzada de progreso**: Cambio de color gradual y efecto de temblor al acercarse al 100%
+- **Modo de lectura inmersivo**: Los controles se ocultan automáticamente tras 2.5 segundos de inactividad
+- **Navegación vertical**: Desplazamiento continuo por el documento (sin toques laterales para cambiar página)
+- **Controles minimalistas**: Barra superior translúcida que aparece/desaparece con un toque
+- **Bloqueo de rotación**: Orientación vertical por defecto para lectura cómoda
+- **Doble toque para zoom**: Alterna entre ajuste de ancho y zoom 150%
+### 🎯 Mejoras de Usabilidad
+- **Barra de progreso más visible**: Altura aumentada de 8dp a 10dp (ahora reducida a 8dp para diseño compacto)
+- **Espaciado optimizado**: Márgenes y padding ajustados para mejor aprovechamiento del espacio
+- **Controles más accesibles**: Mayor área táctil y mejor visibilidad
+- **Gestión inteligente de animaciones**: Cancelación automática en onPause y limpieza en onDestroy para evitar fugas de memoria
+
+## ✨ Características de 5.0.0 (Base)
 
 ### 🎨 Visor de PDF con Interfaz Elegante
 - **Toolbar con degradado semitransparente**: Apariencia moderna y sofisticada en la parte superior

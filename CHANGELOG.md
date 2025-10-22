@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.1.2] - 2025-10-22
+
+### Added
+- **Animación avanzada de progreso de lectura:**
+  - Animación suave de la barra de progreso con interpolación al cambiar de página
+  - Cambio de color gradual de verde a rojo entre 85% y 100% de lectura
+  - Efecto de "temblor" (shake) que comienza al pasar del 80% de progreso
+  - Velocidad del temblor aumenta gradualmente mientras te acercas al 100%
+  - Animación en dos fases con velocidades diferenciadas antes y después del 80%
+  - Sincronización del color del texto del porcentaje con la barra
+  - Gestión inteligente de animaciones con cancelación automática para evitar fugas de memoria
+
+### Changed
+- **Rediseño de toolbars con Material You:**
+  - Fondos semi-transparentes con efecto glassmorphism (blanco translúcido #CCFFFFFF)
+  - Esquinas completamente redondeadas aumentadas de 16dp a 24dp
+  - Márgenes flotantes de 12dp para efecto moderno y elevado
+  - Elevación aumentada a 6dp para mejor profundidad visual
+  - Diseño más compacto con padding optimizado (16dp horizontal, 14dp vertical)
+- **Optimización de tipografía:**
+  - Tamaño de fuente reducido de 18sp a 16sp para información de páginas
+  - Porcentaje reducido de 16sp a 14sp
+  - Altura de barra de progreso ajustada a 8dp para diseño compacto
+  - Mejor aprovechamiento del espacio en pantalla
+- **Mejoras de usabilidad:**
+  - Mejor visibilidad de la barra de progreso
+  - Mayor área táctil en controles
+  - Espaciado optimizado entre elementos
+
+### Fixed
+- Limpieza automática de animadores en `onPause()` y `onDestroy()` para prevenir fugas de memoria
+- Gestión correcta del ciclo de vida de las animaciones
+
 ## [5.0.0] - 2025-10-20
 
 ### Added

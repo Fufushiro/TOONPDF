@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="12dp"
-        android:background="@color/md_theme_light_surfaceVariant">
+        android:background="#E3F2FD">
 
         <!-- Vista previa del PDF -->
         <com.google.android.material.card.MaterialCardView
@@ -32,7 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="@color/md_theme_light_surface"
+                android:background="#FFFFFF"
                 android:contentDescription="@string/cd_pdf_preview" />
 
         </com.google.android.material.card.MaterialCardView>
@@ -53,7 +53,7 @@
                 tools:text="@string/sample_pdf_name"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="@color/md_theme_light_onSurface"
+                android:textColor="#1C1B1F"
                 android:fontFamily="sans-serif-medium"
                 android:maxLines="2"
                 android:ellipsize="end" />
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 tools:text="Página 10 de 50 • hace 2 h"
                 android:textSize="13sp"
-                android:textColor="@color/md_theme_light_outline"
+                android:textColor="#79747E"
                 android:layout_marginTop="4dp"
                 android:fontFamily="sans-serif" />
 
