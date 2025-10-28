@@ -42,24 +42,7 @@ Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblio
 - **Controles más accesibles**: Mayor área táctil y mejor visibilidad
 - **Gestión inteligente de animaciones**: Cancelación automática en onPause y limpieza en onDestroy para evitar fugas de memoria
 
-## ✨ Características de 5.0.0 (Base)
 
-### 🎨 Visor de PDF con Interfaz Elegante
-- **Toolbar con degradado semitransparente**: Apariencia moderna y sofisticada en la parte superior
-- **Controles inferiores con degradado**: Barra de progreso con fondo degradado elegante
-- **Indicador lateral interactivo**: Arrastra el indicador para navegar rápidamente por el PDF
-- **Animaciones elegantes**: El indicador se agranda al tocarlo con efecto de rebote al soltarlo
-- **Barra de progreso con cambio de color dinámico**: 
-  - Azul (0-79%): Color normal
-  - Naranja (80-89%): Transición suave a naranja cuando te acercas al final
-  - Rojo (90-100%): Degradado rojo intenso para indicar que estás terminando el documento
-
-### 🌍 Internacionalización Completa
-- **Soporte completo de i18n**: Todos los textos de la interfaz ahora soportan español e inglés
-- **Cambio automático de idioma**: La aplicación se adapta automáticamente a la configuración del sistema
-- **Mejora de la accesibilidad y consistencia**
-
-## ✨ Características Principales de 5.0.0
 
 ### 🏠 Nueva Pantalla de Inicio Rediseñada
 - **Tarjeta destacada de última lectura**: Muestra el último PDF abierto con vista previa, progreso visual y acceso rápido
@@ -118,34 +101,6 @@ Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblio
 - **Detección de archivos movidos**: Notificación clara si un archivo cambió de ubicación
 - **Búsqueda en tiempo real**: Filtra tu biblioteca instantáneamente
 
-### Historial y Persistencia
-- **Base de datos Room**: Almacenamiento robusto y eficiente
-- **Último PDF abierto**: Acceso rápido a tu lectura más reciente
-- **Progreso visual**: Barra de progreso y porcentaje de lectura
-- **Ordenamiento por fecha**: Los más recientes primero
-
-## 📋 Características Técnicas
-
-### Persistencia de Datos
-- **Room Database v2**: Con migración automática para nuevos campos
-- **Campos guardados por PDF**:
-  - URI del archivo
-  - Nombre del archivo
-  - Página actual
-  - Offset de scroll (posición exacta)
-  - Fecha de última lectura
-  - Total de páginas
-  - Ruta del archivo (para recuperación)
-  - Estado de accesibilidad
-  - Marcador de favorito
-
-
-## 🛠️ Instalación y uso
-
-### Requisitos
-- Android 10 (API 29) o superior
-- ~50 MB de espacio libre
-
 ### Agregar un PDF
 1. Toca el FAB "+" en la esquina inferior derecha
 2. Selecciona un PDF usando el selector de archivos del sistema
@@ -158,43 +113,6 @@ Una aplicación moderna de lectura de PDF para Android con interfaz tipo "biblio
 4. Doble toque para hacer zoom
 5. Tu progreso se guarda automáticamente al salir
 
-### Gestionar Historial
-- **Ver historial**: Navega a la pestaña "Historial" en la barra inferior
-- **Borrar entrada**: Mantén pulsado sobre un PDF y selecciona "Eliminar"
-- **Limpiar todo**: Usa la opción "Limpiar historial" en el menú
-- **Marcar favorito**: Toca el ícono de estrella en el visor
-
-### Exportar/Importar Historial
-1. Ve a Ajustes → Historial
-2. "Exportar historial" → Elige ubicación para guardar JSON
-3. "Importar historial" → Selecciona archivo JSON previamente exportado
-
-## ⚙️ Compilación y firma
-
-### Comandos rápidos
-```bash
-./gradlew clean assembleRelease -x lint -x test
-ls -lh app/build/outputs/apk/release/
-```
-- Artefacto: `app/build/outputs/apk/release/app-release.apk` (≈31 MB)
-- Firma: si `keystore/keystore.properties` existe y es válido, se firma con tu keystore
-
-### Configurar firma (opcional)
-1. Copia tu JKS a `keystore/KEYSTORE.jks`
-2. Crea `keystore/keystore.properties`:
-```properties
-storeFile=keystore/KEYSTORE.jks
-storePassword=TU_PASSWORD
-keyAlias=TU_ALIAS
-keyPassword=TU_PASSWORD_ALIAS
-```
-3. Recompila con `assembleRelease`
-
-## 📦 Optimización del APK
-- R8 activado con minificación y eliminación de recursos no usados
-- Exclusiones de META-INF para reducir tamaño
-- Vector drawables en lugar de PNG
-- Tamaño actual: ~31 MB
 
 ## 🛡️ Privacidad y Seguridad
 - ✅ Sin telemetría ni analytics
@@ -203,24 +121,4 @@ keyPassword=TU_PASSWORD_ALIAS
 - ✅ Exportación cifrable del historial (JSON local)
 - ✅ Sin permisos de almacenamiento invasivos (usa SAF)
 
-## 👨‍💻 Desarrollador
-**fufushiro**
 
-PDFTOON v5.0.0 - Lector de PDF moderno y optimizado para Android
-
-## 📄 Licencia
-MIT. Ver `LICENSE`.
-
-## 🤝 Contribuciones
-Las contribuciones son bienvenidas. Por favor:
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
-## 📧 Soporte
-Para reportar bugs o solicitar features, abre un issue en GitHub.
-
----
-**PDFTOON** - Lectura de PDF simple, elegante y privada 📚
